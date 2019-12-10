@@ -42,7 +42,7 @@ We've already initialized a git repo for you so you may want to save the current
 
 Let's take a look at the files and directories that were created for us (config files have been excluded for now):
 
-<img src="https://user-images.githubusercontent.com/300/70482979-05a2d800-1a9c-11ea-9a38-b3ead0f3b5f1.png" alt="hammerblog directory structure" style="width: 300px" />
+<a href="#"><img src="https://user-images.githubusercontent.com/300/70482979-05a2d800-1a9c-11ea-9a38-b3ead0f3b5f1.png" alt="hammerblog directory structure" style="width: 300px" /></a>
 
 At the top level we have two directories, `api` and `web`. Hammer separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. Yarn refers to these as "workspaces". When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
 
