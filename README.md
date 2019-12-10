@@ -359,13 +359,13 @@ Since we'll probably want a way to create and edit posts going forward let's kee
 
 We already have `HomePage` so we won't need to create that. We want to display a list of posts to the user so we'll need to add that logic. We need to get the content from the database and we don't want the user to just see a blank screen in the meantime (depending on network conditions, server location, etc), so we'll want to show some kind of loading message or animation. And if there's an error retrieving the data we should handle that as well. And what about when we open source this blog engine and someone puts it live without any content in the database? It'd be nice if there was some kind of blank slate message.
 
-Oh boy, our first page and we already have to worry about loading states ,errors and blank slates...or do we?
+Oh boy, our first page and we already have to worry about loading states, errors and blank slates...or do we?
 
 ### Cells
 
-These features are common in most web apps. We wanted to see if there was something we could do to make developers' lives easier when it comes to adding them to a typical component. We think we've come up with something to help and we call them *Cells*.
+These features are common in most web apps. We wanted to see if there was something we could do to make developers' lives easier when it comes to adding them to a typical component. We think we've come up with something to help. We call them *Cells*.
 
-When you create a cell you export several specially named constants and then we take it from there. A typical cell may look something like:
+When you create a cell you export several specially named constants and then Hammer takes it from there. A typical cell may look something like:
 
 ```javascript
 import Post from 'src/components/Blog/Post'
@@ -388,7 +388,10 @@ export const Failure = ({ message }) => <div>Error loading posts: {message}</div
 
 export const Success = ({ posts }) => {
   return posts.map((post) => (
-    <Post key={post.id} post={post} summary={true} />
+    <article>
+      <h2>{ post.title }</h2>
+      <div>{ post.body }</div>
+    </article>
   ))
 }
 ```
@@ -405,4 +408,129 @@ There are also some lifecycle helpers like `beforeQuery` (for massaging any prop
 
 The minimum you need for a cell is the `Query` and `Success` exports. You can handle your own empty or failure states inside the `Success` component itself with some conditionals, but we think those just bog down your component display with messy display logic that can be extracted away.
 
-A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding.
+A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding. Let Hammer worry about juggling what is displayed when and you can focus on the happy path of the final, rendered component populated with data.
+
+### Our First Cell
+
+The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Hammer generator for them:
+
+    hammer generate cell posts
+
+This command will result in a new file at `/web/src/components/PostsCell/PostsCell.js` with some boilerplate to get you started:
+
+```javascript
+// web/src/components/PostsCell/PostsCell.js
+
+export const Query = gql`
+  query {
+    posts {
+      id
+    }
+  }
+`
+
+export const Loading = () => <div>Loading...</div>
+
+export const Empty = () => <div>Empty</div>
+
+export const Failure = ({ message }) => <div>Error: {message}</div>
+
+export const Success = ({ posts }) => {
+  return posts.toString()
+}
+```
+
+To get you off and running as quickly as possible the generator assumes you've got a GraphQL endpoint named the same thing as your cell and gives you the minimum query needed to get something out of the database. Let's plug this into our `HomePage` and see what happens:
+
+```javascript
+// web/src/pages/HomePage/HomePage.js
+
+import { Link, routes } from "src/lib/HammerRouter";
+import BlogLayout from "src/layouts/BlogLayout";
+import PostsCell from "src/components/PostsCell";
+
+const HomePage = () => {
+  return (
+    <BlogLayout>
+      <PostsCell />
+    </BlogLayout>
+};
+
+export default HomePage;
+```
+
+Reloading the browser should actually show an array with a number or two (assuming you created a blog post with our [scaffolding](#Scaffolding-a-Post-Editor) from earlier). Neat!
+
+> **In the `Success` component, where did `posts` come from?**
+>
+> Notice in the `Query` that the name of the query we're running is `posts`. Whatever you name this query, that's the name of the prop that will be available in `Success` with your data. You can alias the name of the variable containing the result of the GraphQL query, and that will be the name of the prop:
+```javascript
+export const Query = gql`
+  query {
+    postIds: posts {
+      id
+    }
+  }
+`
+```
+>
+> Now `postIds` will be available in `Success` instead of `posts`
+
+In addition to the `id` that was added to the `query` by the generator, let's get the title and body, too:
+
+```javascript
+// web/src/components/PostsCell/PostsCell.js
+
+export const Query = gql`
+  query {
+    posts {
+      id
+      title
+      body
+    }
+  }
+`
+```
+
+Reload the page and you should see a dump of all the data you created for any blog posts you scaffolded.
+
+Now we're in the realm of good ol' React components, so just build out the `Success` component to display the blog post in a nicer format:
+
+```javascript
+// web/src/components/PostsCell/PostsCell.js
+
+export const Success = ({ posts }) => {
+  return (
+    <article>
+      <header>
+        <h2>{ post.title }</h2>
+      </header>
+      <div>{ post.body }</h2>
+    </article>
+  )
+}
+```
+
+And just like that we have a blog! It may be the most basic, ugly blog that ever graced the internet, but it's something! (Don't worry, we've got more features to add.)
+
+[screenshot]
+
+To sum up, what did we actually do to get this far?
+
+1. Generate the homepage
+2. Generate the blog layout
+3. Define the database schema
+4. Run migrations to update the database and create a table
+5. Scaffold a CRUD interface to the database table
+6. Create a cell to load the data and take care of loading/empty/failure/success states
+7. Add the cell to the page
+
+This will become a standard lifecycle of new features as you build a Hammer app.
+
+So far, other than a little HTML, we haven't had to do much by hand. And we especially didn't have to write a bunch of plumbing just to move data from one place to another. Makes web development a little more enjoyable, don't you think?
+
+## Side Quest: How Hammer Works with Data
+
+(Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc)
+
+## Displaying a Single Blog Post - Routing Params
