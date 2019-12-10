@@ -66,7 +66,7 @@ That's it for the backend. Let's take a look at the frontend `web` directory:
 - `index.js` contains the bootstraping code to get our Hammer app up and running.
 - `Routes.js` contains the route definitions for our app
 
-## Our First Page and Route
+## Our First Page
 
 Let's give our users something to look at besides the Hammer welcome page. We'll use the `hammer` command line tool to create a page for us:
 
@@ -74,8 +74,8 @@ Let's give our users something to look at besides the Hammer welcome page. We'll
 
 This will do two things:
 
-- create `/web/src/pages/home.js`
-- add a `<Route>` in `/web/Routes.js` that maps the path `/` to the new _Home_ page
+- create `/web/src/pages/HomePage/HomePage.js`
+- add a `<Route>` in `/web/Routes.js` that maps the path `/` to the new _HomePage_ page
 
 In fact this page is already live. If you reload your browser you should see this new page instead of the Hammer welcome page:
 
@@ -83,10 +83,163 @@ In fact this page is already live. If you reload your browser you should see thi
 
 It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `/web/src/Routes.js` and take a look at the route that was created:
 
-    <Route path="/" page="home">
+    <Route path="/" page={HomePage}>
 
 Try changing the route to something like:
 
-    <Route path="/hello" page="home">
+    <Route path="/hello" page={HomePage}>
 
-When the browser reloads you should see the Hammer welcome page again. That's because we abandoned the root URL so Hammer takes over and shows the splash screen. Change your URL to `http://localhost:8910/hello" and you should see our page again.
+When the browser reloads you should see the Hammer welcome page again. That's because we abandoned the root URL so Hammer takes over and shows the splash screen again. Change your URL to `http://localhost:8910/hello" and you should see our page again.
+
+Change the route back to `/` before continuing!
+
+## A Second Page and a Link
+
+Let's create an "About" page for our blog so everyone knows about the geniuses behind this achievement. We'll create another page using `hammer`:
+
+    hammer page about /about
+
+http://localhost:8910/about should show our new page. But no one's going to find it by changing the URL so let's add a link from our homepage to the About page and vice versa. We'll start creating a simple header and nav bar at the same time:
+
+```javascript
+// /web/src/pages/HomePage/HomePage.js
+
+import { Link, routes } from 'src/lib/HammerRouter'
+
+const HomePage = () => {
+  return (
+    <header>
+      <h1>Hammer Blog</h1>
+      <nav>
+        <ul>
+          <li><Link to={routes.aboutPage()}>About</Link></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      Home
+    </main>
+  )
+}
+
+export default HomePage
+```
+
+Let's point out a few things here:
+
+- Hammer loves [Function Components](https://www.robinwieruch.de/react-function-component). We'll make extensive use of [React Hooks](https://reactjs.org/docs/hooks-intro.html) as we go and these are only enabled in functional components. You're free to create class components if you want but we haven't found any cases that functional components + hooks were unable to handle.
+- Hammer's `<Link>` tag, in its most basic usage, takes a single `to` attribute. That `to` attribute will point to a _Named Route_. By default the name of the route is name of the page itself, in this case `aboutPage`. Named routes are awesome because if you ever change your route, you only change it `Router.js` and every link using named routes will automatically point to the correct place.
+
+Once we get to the About page we don't have any way to get back so lets add a link there as well:
+
+```javascript
+// /web/src/pages/AboutPage/AboutPage.js
+
+import { Link, routes } from 'src/lib/HammerRouter'
+
+const AboutPage = () => {
+  return (
+    <header>
+      <h1>Hammer Blog</h1>
+      <nav>
+        <ul>
+          <li><Link to={routes.aboutPage()}>About</Link></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <p>
+        This site was created to demonstrate my mastery of Hammer!
+        Look on my works, ye mighty, and despair!
+      </p>
+      <Link to={routes.homePage()}>Return home</Link>
+    </main>
+  )
+}
+
+export default AboutPage
+```
+
+Great! Try that out in the browser and verify you can get back and forth.
+
+As a world-class developer you probably saw that copy and pasted `<header>` (and even `<main>`) and developed an involuntary facial tick. We feel you. That's why Hammer has a little something called _Layouts_.
+
+## Layouts
+
+One way to solve the `<header>` dilemma would be to create a `<Header>` component and include it in both `HomePage` and `AboutPage`. That works, but you've still copied and pasted, albeit a much shorter block of text. What else can we do?
+
+When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes "before" (a `<header>`) or "after" (a `<footer>`). That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
+
+<img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" style="width: 300px">
+
+Let's create a component to hold that `<header>`:
+
+    hammer layout blog
+
+That created `/web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
+
+Copy the `<header>` and opening and closing `<main>` from both `HomePage` and `AboutPage` and add it to the layout instead:
+
+```javascript
+// /web/src/layouts/BlogLayout/BlogLayout.js
+
+import { Link, routes } from 'src/lib/HammerRouter'
+
+const BlogLayout = (props) => {
+  return (
+    <header>
+      <h1>Hammer Blog</h1>
+      <nav>
+        <ul>
+          <li><Link to={routes.aboutPage()}>About</Link></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      { props.children }
+    </main>
+  )
+}
+
+export default BlogLayout
+```
+
+`props.children` is where the magic will happen. Any page content given to the layout will be rendered here. Back to `HomePage` and `AboutPage`, we add a `<BlogLayout>` wrapper and now they're back to containing only the content they care about:
+
+```javascript
+// /web/src/pages/HomePage/HomePage.js
+import { Link, routes } from "src/lib/HammerRouter";
+import BlogLayout from "src/layouts/BlogLayout";
+
+const HomePage = () => {
+  return <BlogLayout>Home</BlogLayout>;
+};
+
+export default HomePage;
+
+// /web/src/pages/AboutPage/AboutPage.js
+import { Link, routes } from "src/lib/HammerRouter";
+import BlogLayout from "src/layouts/BlogLayout";
+
+const AboutPage = () => {
+  return (
+    <BlogLayout>
+      <p>
+        This site was created to demonstrate my mastery of Hammer! Look on my works, ye mighty, and
+        despair!
+      </p>
+      <Link to={routes.homePage()}>Return home</Link>
+    </BlogLayout>
+  );
+};
+
+export default AboutPage;
+```
+
+Back to the browser and you should see...nothing different. But that's good, it means our layout is working.
+
+## Getting Dynamic
+
+These two pages are great and all but the real meat and potatoes of a blog are the blog posts. Let's make those next.
+
+For the purposes of our tutorial we're going to get our blog posts from a database.
