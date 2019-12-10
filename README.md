@@ -242,7 +242,7 @@ Back to the browser and you should see...nothing different. But that's good, it 
 
 You may have noticed some duplication in Hammer's file names. Pages live in a directory called `/pages` and also contain `Page` in their name. Same with Layouts. What's the deal?
 
-When you have dozens of files open in your editor it's easy to get lost, especially when you have several files with names that are similar or even the same (they happen to be in different directories). We've found that the extra duplication in the names of files is worth the productivity benefit when scanning through your file list.
+When you have dozens of files open in your editor it's easy to get lost, especially when you have several files with names that are similar or even the same (they happen to be in different directories). We've found that the extra duplication in the names of files is worth the productivity benefit when scanning through your open tabs.
 
 This naming convention isn't actually enforced by the framework, but the suffix will be added by any files created by the `hammer` CLI. Feel free to name pages and layouts however you like!
 
