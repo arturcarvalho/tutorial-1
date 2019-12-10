@@ -79,7 +79,7 @@ This will do two things:
 
 In fact this page is already live. If you reload your browser you should see this new page instead of the Hammer welcome page:
 
-![image](https://user-images.githubusercontent.com/300/70484154-d1c9b180-1a9f-11ea-967e-f3af142a5ba4.png)
+![image](https://user-images.githubusercontent.com/300/70487560-9b456400-1aaa-11ea-8dd1-d74fa4123154.png)
 
 It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `/web/src/Routes.js` and take a look at the route that was created:
 
