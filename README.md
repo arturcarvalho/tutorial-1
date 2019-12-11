@@ -534,3 +534,214 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 (Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc)
 
 ## Displaying a Single Blog Post - Routing Params
+
+Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
+
+    hammer generate page Post
+
+Now let's link the title of the post on the homepage to the detail page:
+
+```javascript
+// web/src/components/PostsCell/PostsCell.js
+
+export const Success = ({ posts }) => {
+  return (
+    <article>
+      <header>
+        <h2>
+          <Link to={routes.post()}>{ post.title }</Link>
+        </h2>
+      </header>
+      <div>{ post.body }</h2>
+    </article>
+  )
+}
+```
+
+If you reload and click the link you should see the boilerplate text on {PostPage}. But what we really need is specify *which* post we want to view on this page. We can do that by passing a hash to the `routes` helper. Right now the only thing guaranteed to be unique about a job post is its `id` so we'll use that:
+
+```javascript
+// web/src/pages/PostsPage/PostsPage.js
+
+<Link to={routes.post({ id: post.id })}>{ post.title }</Link>
+```
+
+Now if follow that link you'll get...the 404 page. See the URL? Our `<Route>` that was generated no longer matches: it's expecting extactly `/post` but now the URL has something like `/post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
+
+```javascript
+// web/src/Routes.js
+
+<Route path="/post/:id" page={PostPage} name="post" />
+```
+
+Hammer calls these *route parameters*. They say "whatever value is in this position in the path, call it *this* and let me reference it later."
+
+Back to the browser again and we should we should be in good shape, the `{PostPage}` is loading just fine. How do we get access to that `:id` so we can pull the right post from the database? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
+
+    hammer generate cell Post
+
+And then we'll use that cell in `PostPage` (and while we're at it lets surround the page with the `BlogLayout`):
+
+```javascript
+// web/src/pages/PostPage/PostPage.js
+
+import { Link, routes } from "src/lib/HammerRouter";
+import BlogLayout from "src/layouts/BlogLayout";
+import PostCell from "src/components/PostCell";
+
+const PostPage = () => {
+  return (
+    <BlogLayout>
+      <PostCell />
+    </BlogLayout>
+  )
+};
+
+export default PostPage;
+```
+
+Now over to the cell, we need access to that `:id` route param so we can look up the ID of the post in the database. Let's update the query to accept a variable:
+
+```javascript
+// web/src/cells/PostCell/PostCell.js
+
+export const Query = gql`
+  query($id: Int) {
+    post(id: $id) {
+      id
+      title
+      body
+    }
+  }
+```
+
+And update `Success` to dump the contents of the `post` query so we can see if it worked:
+
+```javascript
+// web/src/cells/PostCell/PostCell.js
+
+export const Success = ({ post }) => {
+  return post.toString()
+}
+```
+
+Okay, we're getting closer. Still, where will that `$id` come from? Hammer has another trick up its sleeve. Whenever you put a query param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
+
+```javascript
+// web/src/pages/PostPage/PostPage.js
+
+const PostPage = ({ id }) => {
+  return (
+    <BlogLayout>
+      <PostCell id={id} />
+    </BlogLayout>
+  )
+};
+```
+
+`id` already exists since we named our route param `:id`. Thanks Hammer! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Hammer by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
+
+I'll prove it! Just reload the browser and—uh oh. Hmm. Okay that's not our fault. This little bug is brought to us by the original HTTP spec: everything in the URL is considered a string, but GraphQL wants an integer for the ID. So in this case we'll need to convert it before it's turned into a variable for GraphQL. Luckily we've got a nice place to do that: as it's passed into the cell:
+
+```javascript
+// web/src/pages/PostPage/PostPage.js
+
+const PostPage = () => {
+  return (
+    <BlogLayout>
+      <PostCell id={parseInt(id)} />
+    </BlogLayout>
+  )
+};
+```
+
+Voilá!
+
+> **What if I want to pass some other prop to the cell that I don't need in the query, but do need in the Success/Loader/etc. components?**
+>
+> All of the props you give to the cell will be automatically available as props in the render components. Only the ones that match the GraphQL variables list will be given to the query. You get the best of both worlds! In our post display above, if you wanted to display some random number along with the post (for some contrived, tutorial-like reason), just pass that prop:
+
+```javascript
+<PostCell id={id} rand={Math.random()}>
+```
+
+> And get it, along with the query result (and even the original `id` if you want) in the component:
+
+```javascript
+export const Success = ({ post, id, rand }) => {
+  //...
+}
+```
+
+> Thanks again, Hammer!
+
+Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Hammer-up a component (I just invented that phrase):
+
+    hammer generate component Post
+
+Which creates `web/src/components/Post/Post.js` as a super simple React component:
+
+```javascript
+// web/src/components/Post/Post.js
+
+const Post = () => {
+  return null
+}
+
+export default Post
+```
+
+> You may notice we don't have any explict `import` statements for `react` itself. We (the Hammer dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you! We do the same thing with `routes` and a few other packages that are used in lots of places.
+
+Let's take the post display code out of `PostsCell` and put it here instead, passing the `post` in as a prop:
+
+```javascript
+// web/src/components/Post/Post.js
+
+const Post = ({ post }) => {
+  return (
+    <article>
+      <header>
+        <h2>
+          <Link to={routes.post()}>{ post.title }</Link>
+        </h2>
+      </header>
+      <div>{ post.body }</h2>
+    </article>
+  )
+}
+
+export default Post
+```
+
+And update `PostsCell` and `PostCell` to use this new component instead:
+
+```javascript
+// web/src/components/PostsCell/PostsCell.js
+export const Success = ({ posts }) => {
+  return posts.map(post => <Post post={post}>)
+}
+
+// web/src/components/PostCell/PostCell.js
+export const Success = ({ post }) => {
+  return <Post post={post}>
+}
+```
+
+And there we go! We should be able to move back and forth between the homepage and the detail page.
+
+Let's summarize:
+
+1. We created a new page to show a single post (the "detail" page)
+2. We added a route to handle the `id` of the post and turn it into a route param
+3. We created a cell to fetch and display the post
+4. Hammer made the world a better place by making that `id` available to us at several key junctions in our code
+5. We turned the actual post display into a standard React component and used it in both the homepage and new detail page.
+
+## Side Quest: Why are all these Hammer files inside a directory with the same name?
+
+Talk about component + storybook + tests + etc.
+
+## Everyone's Favorite Thing to Build: Forms
+
+Time to blow some minds.
