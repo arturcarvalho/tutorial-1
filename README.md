@@ -204,7 +204,7 @@ const BlogLayout = (props) => {
       <h1>Hammer Blog</h1>
       <nav>
         <ul>
-          <li><Link to={routes.aboutPage()}>About</Link></li>
+          <li><Link to={routes.about()}>About</Link></li>
         </ul>
       </nav>
     </header>
@@ -241,7 +241,7 @@ const AboutPage = () => {
         This site was created to demonstrate my mastery of Hammer:
         Look on my works, ye mighty, and despair!
       </p>
-      <Link to={routes.homePage()}>Return home</Link>
+      <Link to={routes.home()}>Return home</Link>
     </BlogLayout>
   );
 };
@@ -260,6 +260,32 @@ Back to the browser and you should see...nothing different. But that's good, it 
 > If you're using the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) plugin this also helps disambiguate when browsing through your component stack:
 >
 > <img src="https://user-images.githubusercontent.com/300/70564528-3854db00-1b45-11ea-9976-d6e5ddfb571f.png" style="width:400px">
+
+One more `<Link>`, let's have the title/logo link back to the homepage as per usual:
+
+```javascript
+// web/src/layouts/BlogLayout/BlogLayout.js
+
+import { Link, routes } from 'src/lib/HammerRouter'
+
+const BlogLayout = (props) => {
+  return (
+    <header>
+      <h1><Link to={routes.home()}>Hammer Blog</Link></h1>
+      <nav>
+        <ul>
+          <li><Link to={routes.about()}>About</Link></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      { props.children }
+    </main>
+  )
+}
+
+export default BlogLayout
+```
 
 ## Getting Dynamic
 
@@ -738,10 +764,421 @@ Let's summarize:
 4. Hammer made the world a better place by making that `id` available to us at several key junctions in our code
 5. We turned the actual post display into a standard React component and used it in both the homepage and new detail page.
 
-## Side Quest: Why are all these Hammer files inside a directory with the same name?
+## Side Quest: Naming Conventions
 
-Talk about component + storybook + tests + etc.
+* Why things are named like Component/Component.js
+* Storybook and tests
+* SDL and services
 
 ## Everyone's Favorite Thing to Build: Forms
 
-Time to blow some minds.
+Wait, don't close your browser! You had to know this coming eventually, didn't you? And you've probably realized by now we wouldn't even have this section in the tutorial unless Hammer had figured out a way to make forms less soul-sucking than usual. In fact Hammer might even make you *love* building forms. Well, love is a strong word. *Like* building forms. *Tolerate* building them?
+
+We already have a form or two in our app; remember our posts scaffold? And those work pretty well! How hard can it be? (Hopefully you haven't sneaked a peek at that code—what's coming next will be much more impressive if you haven't yet.)
+
+Let's build the simpliest form that still makes sense for our blog, a "contact us" form.
+
+### The Page
+
+    hammer generate page Contact /contact
+
+We can put a link to Contact in our header:
+
+```javascript
+// web/src/layouts/BlogLayout/BlogLayout.js
+
+const BlogLayout = (props) => {
+  return (
+    <header>
+      <h1><Link to={routes.home()}>Hammer Blog</Link></h1>
+      <nav>
+        <ul>
+          <li><Link to={routes.about()}>About</Link></li>
+          <li><Link to={routes.contact()}>Contact</Link></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      { props.children }
+    </main>
+  )
+}
+```
+
+Double check that everything looks good and then let's get to the good stuff.
+
+### Introducing HammerForm
+
+Forms in React are infamously annoying to work with. There are [Controlled Components](https://reactjs.org/docs/forms.html#controlled-components) and [Uncontrolled Components](https://reactjs.org/docs/uncontrolled-components.html) and [third party libraries](https://jaredpalmer.com/formik/) and many more workarounds to try and make forms in React as simple as they were originally intended to be: an `<input>` field with a `name` attribute that gets submitted somewhere when you click a `<button>`.
+
+We think Hammer is a step or two in the right direction by not only freeing you from writing controlled component plumbing, but also dealing with validation and errors automatically. Let's see how it works.
+
+For now we won't be talking to the database in our Contact form so we won't create a cell. Let's create the form right on the page. Hammer forms start with the...wait for it...`<HammerForm>` tag:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  return (
+    <HammerForm></HammerForm>
+  )
+}
+
+export default ContactPage
+```
+
+Well that was anticlimactic. You can't even see it in the browser. Let's add a form field so we can at least see something. Hammer ships with several inputs and a plain text input box is `<TextField>`. We'll also give the field a `name` attribute so that once there are multiple inputs on this page we'll know which contains which data:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  return (
+    <HammerForm>
+      <TextField name="input" />
+    </HammerForm>
+  )
+}
+```
+
+[screenshot]
+
+Something it showing! Still, pretty boring. How about adding a submit button?
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  return (
+    <HammerForm>
+      <TextField name="input" />
+      <Submit>Save</Submit>
+    </HammerForm>
+  )
+}
+```
+
+[screenshot]
+
+We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up but we have no indication that the form submitted or what happened to the data. Next we'll get the data in our fields.
+
+### onSubmit
+
+Similar to a plain HTML form we'll give `<HammerForm>` an `onSubmit` handler. That handler will be called with a single argument—an object containing all of the submitted form fields:
+
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const onSubmit = (data) {
+    console.log(data)
+  }
+
+  return (
+    <HammerForm onSubmit={onSubmit}>
+      <TextField name="input" />
+      <Submit>Save</Submit>
+    </HammerForm>
+  )
+}
+```
+
+Now try filling in some data and submitting:
+
+[screenshot]
+
+Great! Let's turn this into a more useful form by adding a couple fields. We'll rename the existing one to "name" and add "email" and "message":
+
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <TextField name="name" />
+    <TextField name="email" />
+    <TextArea name="message" />
+    <Submit>Save</Submit>
+  </HammerForm>
+)
+```
+
+See the new `<TextArea>` component here which generates an HTML `<textarea>` but that contains Hammer's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
+
+[screenshot]
+
+Let's add some labels and just a tiny bit of styling to at least separate the fields onto their own lines.
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name" style={{ display: 'block' }} />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email" style={{ display: 'block' }}/>
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message" style={{ display: 'block' }} />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+[screenshot]
+
+That's a little better. Try filling out the form and submitting and you should get a console message with all three fields now.
+
+### Validation
+
+"Okay Hammer tutorial author," you're saying, "what's the big deal? You built up Hammer's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! But anyone can fill out a form *correctly* (although there are plenty of QA folks who would challenge that assumption), what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Hammer, that's who!
+
+All three of these fields should be required in order for someone to send a message to us. Let's enforce that with the standard HTML `required` attribute:
+
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name" style={{ display: 'block' }} required />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email" style={{ display: 'block' }} required />
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message" style={{ display: 'block' }} required />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+Now when trying to submit there'll be message from the browser noting that a field must be filled in. This is better than nothing, but these messages can't be styled. Can we do better?
+
+Yes! Let's update that `required` call to instead be an object we pass to a custom attribute on Hammer form helpers called `validation`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name" style={{ display: 'block' }} validation={{ required: true }} />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email" style={{ display: 'block' }} validation={{ required: true }} />
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message" style={{ display: 'block' }} validation={{ required: true }} />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want! Introducing `<FieldError>`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name" style={{ display: 'block' }} validation={{ required: true }} />
+    <FieldError name="name" />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email" style={{ display: 'block '}} validation={{ required: true }} />
+    <FieldError name="email" />
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message" style={{ display: 'block' }} validation={{ required: true }} />
+    <FieldError name="message" />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+Note that the `name` attribute matches the `name` of the input field above it. That's so it knows which field to display errors for. Try submitting that form now.
+
+[screenshot]
+
+But this is just the beginning. Let's make sure folks realize this is an error message:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name" style={{ display: 'block' }} validation={{ required: true }} />
+    <FieldError name="name" style={{ color: 'red' }} />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email" style={{ display: 'block' }} validation={{ required: true }} />
+    <FieldError name="email" style={{ color: 'red' }} />
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message" style={{ display: 'block' }} validation={{ required: true }} />
+    <FieldError name="message" style={{ color: 'red' }} />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+[screenshot]
+
+You know what would be nice, if the input itself somehow displayed the fact that there was an error:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <label for="name" style={{ display: 'block' }}>Name</label>
+    <TextField name="name"
+               style={{ display: 'block' }}
+               errorStyle={{ borderColor: 'red' }}
+               validation={{ required: true }} />
+    <FieldError name="name" style={{ color: 'red' }} />
+
+    <label for="email" style={{ display: 'block' }}>Email</label>
+    <TextField name="email"
+               style={{ display: 'block' }}
+               errorStyle={{ borderColor: 'red' }}
+               validation={{ required: true }} />
+    <FieldError name="email" style={{ color: 'red' }} />
+
+    <label for="message" style={{ display: 'block' }}>Message</label>
+    <TextArea name="message"
+              style={{ display: 'block' }}
+              errorStyle={{ borderColor: 'red' }}
+              validation={{ required: true }} />
+    <FieldError name="message" style={{ color: 'red' }} />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+Oooo, what if the *label* could change as well? It can, but we'll need Hammer's custom `<Label>` component for that (note that `for` becomes `name` just like the other components):
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <HammerForm onSubmit={onSubmit}>
+    <Label name="name"
+           style={{ display: 'block' }}
+           errorStyle={{ color: 'red' }}>Name</Label>
+    <TextField name="name"
+               style={{ display: 'block' }}
+               errorStyle={{ borderColor: 'red' }}
+               validation={{ required: true }} />
+    <FieldError name="name" style={{ color: 'red' }} />
+
+    <Label name="name"
+           style={{ display: 'block' }}
+           errorStyle={{ color: 'red' }}>Email</Label>
+    <TextField name="email"
+               style={{ display: 'block' }}
+               errorStyle={{ borderColor: 'red' }}
+               validation={{ required: true }} />
+    <FieldError name="email" style={{ color: 'red' }} />
+
+    <Label name="name"
+           style={{ display: 'block' }}
+           errorStyle={{ color: 'red' }}>Message</Label>
+    <TextArea name="message"
+              style={{ display: 'block' }}
+              errorStyle={{ borderColor: 'red' }}
+              validation={{ required: true }} />
+    <FieldError name="message" style={{ color: 'red' }} />
+
+    <Submit style={{ display: 'block' }}>Save</Submit>
+  </HammerForm>
+)
+```
+
+[screenshot]
+
+> In addition to `style` and `errorStyle` you can also use `className` and `errorClassName`
+
+We should make sure the email field actually contains an email:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<TextField name="email"
+           style={{ display: 'block' }}
+           errorStyle={{ borderColor: 'red' }}
+           validation={{
+             required: true,
+             pattern: {
+               value: /[^@]+@[^\.]+\..+/
+             }
+           }} />
+```
+
+That is definitely not the end-all-be-all for email address validation, but pretend it's bulletproof. Let's also change the message on the email validation to be a little more friendly:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<TextField name="email"
+           style={{ display: 'block' }}
+           errorStyle={{ borderColor: 'red' }}
+           validation={{
+             required: true,
+             pattern: {
+               value: /[^@]+@[^\.]+\..+/,
+               message: 'Please enter a valid email address'
+             }
+           }} />
+```
+
+You probably noticed that trying to submit a form with validation errors should output nothing to the console—it's not actually submitting. Fix the errors and all is well.
+
+Finally, you know what would *really* be nice: if the fields were validated as soon as the user leaves each one so they don't fill out the whole thing and submit just to see multiple errors appear. Let's do that:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+```
+
+Well, what do you think? Was it worth the hype? I couple new components and you've got forms that handle validation and wrap up submitted values in a nice data object, all for free.
+
+> Hammer's forms are built on top of [React Hook Form](https://react-hook-form.com/) so there is  even more functionality available than we've documented here.
+
+Hammer has one more trick up its sleeve when it comes to forms but we'll save that for when we're actually submitting one to the server.
+
+Having a contact form is great, but only if you actually get the contact somehow. Let's create a database table to hold the submitted data and create our first GraphQL mutation.
+
+## Saving Data
+
+* Create migration
+* lift up
+* Generate SDL
+* Create service
+* Simulate server error (remove validation on client form field so server blows up)
+
+## Administration
+
+* Move original post scaffold to /admin
+* Authentication to lock down access
+* First deploy so that we can setup Netlify identity
+
+## Deployment
+
+* Branch deploys
+* Netlify forms
+* Custom functions
