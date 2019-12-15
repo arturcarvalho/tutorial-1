@@ -77,12 +77,12 @@ That's it for the backend. Let's take a look at the frontend `web` directory:
 
 Let's give our users something to look at besides the Hammer welcome page. We'll use the `hammer` command line tool to create a page for us:
 
-    hammer page home /
+    hammer generate page home /
 
 This will do two things:
 
-- create `/web/src/pages/HomePage/HomePage.js`
-- add a `<Route>` in `/web/Routes.js` that maps the path `/` to the new _HomePage_ page
+- create `/web/src/pages/HomePage/HomePage.js`. Hammer takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
+- add a `<Route>` in `/web/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
 > If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Hammer automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up our routes file.
 
@@ -98,15 +98,17 @@ Try changing the route to something like:
 
     <Route path="/hello" page={HomePage} name="home" />
 
-When the browser reloads, you'll see the NotFound page. As soon as you add your first route, you'll never see the Hammer splash screen again. Now, when no route can be found that matches the requested URL, you'll see the NotFound page. Change your URL to `http://localhost:8910/hello" and you should see our page again.
+When the browser reloads, you'll see the `NotFoundPage` page. As soon as you add your first route, you'll never see the Hammer splash screen again. From now on, when no route can be found that matches the requested URL, Hammer will render the `NotFoundPage`. Change your URL to `http://localhost:8910/hello" and you should see our page again.
 
-Change the route back to `/` before continuing!
+Change the route path back to `/` before continuing!
 
 ## A Second Page and a Link
 
 Let's create an "About" page for our blog so everyone knows about the geniuses behind this achievement. We'll create another page using `hammer`:
 
-    hammer generate page about /about
+    hammer generate page about
+
+> Notice that we didn't specify a route path this time. If you leave it off the `hammer generate page` command, Hammer will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be "/about".
 
 http://localhost:8910/about should show our new page. But no one's going to find it by manually changing the URL so let's add a link from our homepage to the About page and vice versa. We'll start creating a simple header and nav bar at the same time:
 
@@ -137,13 +139,13 @@ export default HomePage
 Let's point out a few things here:
 
 - Hammer loves [Function Components](https://www.robinwieruch.de/react-function-component). We'll make extensive use of [React Hooks](https://reactjs.org/docs/hooks-intro.html) as we go and these are only enabled in function components. You're free to use class components, but we recommend avoiding them unless you need their special capabilities.
-- Hammer's `<Link>` tag, in its most basic usage, takes a single `to` attribute. That `to` attribute will point to a _Named Route_. The function you call is the same as the `name` attribute on the `<Route>`:
+- Hammer's `<Link>` tag, in its most basic usage, takes a single `to` attribute. That `to` attribute calls a _named route function_ in order to generate the correct URL. The function has the same name as the `name` attribute on the `<Route>`:
 
     `<Route path="/about" page={AboutPage} name="about" />`
 
-  If you don't like the name that `hammer generate` used for your route, feel free to change it! Named routes are awesome because if you ever change the path associated with a route, you need only change it in `Router.js` and every link using named routes will still point to the correct place.
+  If you don't like the name that `hammer generate` used for your route, feel free to change it in `Routes.js`! Named routes are awesome because if you ever change the path associated with a route, you need only change it in `Routes.js` and every link using a named route function will still point to the correct place. You can also pass a string to the `to` attribute, but you'll lose out on all the Hammer goodness that named routes provide.
 
-Once we get to the About page we don't have any way to get back so lets add a link there as well:
+Once we get to the About page we don't have any way to get back so let's add a link there as well:
 
 ```javascript
 // web/src/pages/AboutPage/AboutPage.js
@@ -221,17 +223,17 @@ export default BlogLayout
 
 ```javascript
 // web/src/pages/HomePage/HomePage.js
-import BlogLayout from "src/layouts/BlogLayout";
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const HomePage = () => {
-  return <BlogLayout>Home</BlogLayout>;
-};
+  return <BlogLayout>Home</BlogLayout>
+}
 
 export default HomePage;
 
 // web/src/pages/AboutPage/AboutPage.js
-import { Link, routes } from "src/lib/HammerRouter";
-import BlogLayout from "src/layouts/BlogLayout";
+import { Link, routes } from 'src/lib/HammerRouter'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const AboutPage = () => {
   return (
@@ -242,10 +244,10 @@ const AboutPage = () => {
       </p>
       <Link to={routes.home()}>Return home</Link>
     </BlogLayout>
-  );
-};
+  )
+}
 
-export default AboutPage;
+export default AboutPage
 ```
 
 Back to the browser and you should see...nothing different. But that's good, it means our layout is working.
@@ -585,7 +587,7 @@ export const Success = ({ posts }) => {
 }
 ```
 
-If you reload and click the link you should see the boilerplate text on `{PostPage}`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
+If you reload and click the link you should see the boilerplate text on `PostPage`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
 
 ```javascript
 // web/src/Routes.js
@@ -605,11 +607,11 @@ Cool, cool, cool. But now we need to construct a link that has the ID of a post 
 
 For routes with route parameters, the `routes` helper expects an object where you specify a value for each parameter. If you click on the link now, it will indeed take you to `/post/1` (or similar, depending on the ID of the post).
 
-Ok, so the ID is in the URL. What do we need next in order to display a page? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
+Ok, so the ID is in the URL. What do we need next in order to display a post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
     hammer generate cell post
 
-And then we'll use that cell in `PostPage` (and while we're at it lets surround the page with the `BlogLayout`):
+And then we'll use that cell in `PostPage` (and while we're at it let's surround the page with the `BlogLayout`):
 
 ```javascript
 // web/src/pages/PostPage/PostPage.js
@@ -654,7 +656,7 @@ export const Success = ({ post }) => {
 }
 ```
 
-Okay, we're getting closer. Still, where will that `$id` come from? Hammer has another trick up its sleeve. Whenever you put a query param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
+Okay, we're getting closer. Still, where will that `$id` come from? Hammer has another trick up its sleeve. Whenever you put a route param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
 
 ```javascript
 // web/src/pages/PostPage/PostPage.js
@@ -728,7 +730,7 @@ Let's take the post display code out of `PostsCell` and put it here instead, pas
 // web/src/components/Post/Post.js
 
 const Post = ({ post }) => {
-  return posts.map((post) => (
+  return (
     <article>
       <header>
         <h2>
@@ -737,7 +739,7 @@ const Post = ({ post }) => {
       </header>
       <div>{post.body}</h2>
     </article>
-  ))
+  )
 }
 
 export default Post
@@ -783,7 +785,7 @@ Let's build the simplest form that still makes sense for our blog, a "contact us
 
 ### The Page
 
-    hammer generate page contact /contact
+    hammer generate page contact
 
 We can put a link to Contact in our header:
 
