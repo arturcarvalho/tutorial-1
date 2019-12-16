@@ -79,10 +79,10 @@ Let's give our users something to look at besides the Hammer welcome page. We'll
 
     hammer generate page home /
 
-This will do two things:
+This does two things:
 
-- create `/web/src/pages/HomePage/HomePage.js`. Hammer takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
-- add a `<Route>` in `/web/Routes.js` that maps the path `/` to the new _HomePage_ page.
+- Creates `/web/src/pages/HomePage/HomePage.js`. Hammer takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
+- Adds a `<Route>` in `/web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
 > If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Hammer automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up our routes file.
 
@@ -108,7 +108,7 @@ Let's create an "About" page for our blog so everyone knows about the geniuses b
 
     hammer generate page about
 
-> Notice that we didn't specify a route path this time. If you leave it off the `hammer generate page` command, Hammer will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be "/about".
+> Notice that we didn't specify a route path this time. If you leave it off the `hammer generate page` command, Hammer will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be `/about`.
 
 http://localhost:8910/about should show our new page. But no one's going to find it by manually changing the URL so let's add a link from our homepage to the About page and vice versa. We'll start creating a simple header and nav bar at the same time:
 
@@ -304,7 +304,7 @@ We need to decide what data we'll need for a blog post. We'll expand on this at 
 
 We use [Prisma Photon](https://photonjs.prisma.io/) to talk to the database. Prisma has another library called Lift that lets us update the database's schema in a predictable way and snapshot each of those changes. Each change is called a _migration_ and Lift will create one when we make changes to our schema.
 
-First let's define the data structre for a post in the database. Open up `/api/prisma/schema.prisma` and add the following:
+First let's define the data structure for a post in the database. Open up `/api/prisma/schema.prisma` and add the following:
 
 ```javascript
 model Post {
@@ -373,7 +373,7 @@ Here's what happened when we ran that `hammer generate scaffold post` command:
   - `ShowPostPage`
 - Created routes for those pages in `/web/src/Routes.js`
 
-Since we scaffolded "post" we got the pluralized name for our newly generated SDL, service and pages (they do contain deal with multiple posts, not just one post!)
+Since we scaffolded "post" we got the pluralized name for our newly generated SDL, service, and pages (they do deal with multiple posts, not just one post!)
 
 ### Creating a Homepage
 
@@ -386,7 +386,7 @@ Since we'll probably want a way to create and edit posts going forward let's kee
 
 We already have `HomePage` so we won't need to create that. We want to display a list of posts to the user so we'll need to add that logic. We need to get the content from the database and we don't want the user to just see a blank screen in the meantime (depending on network conditions, server location, etc), so we'll want to show some kind of loading message or animation. And if there's an error retrieving the data we should handle that as well. And what about when we open source this blog engine and someone puts it live without any content in the database? It'd be nice if there was some kind of blank slate message.
 
-Oh boy, our first page with data and we already have to worry about loading states, errors and blank slates...or do we?
+Oh boy, our first page with data and we already have to worry about loading states, errors, and blank slates...or do we?
 
 ### Cells
 
@@ -395,7 +395,7 @@ These features are common in most web apps. We wanted to see if there was someth
 When you create a cell you export several specially named constants and then Hammer takes it from there. A typical cell may look something like:
 
 ```javascript
-import Post from 'src/components/Blog/Post'
+import Post from 'src/components/Post'
 
 export const QUERY = gql`
   query {
@@ -595,7 +595,7 @@ If you reload and click the link you should see the boilerplate text on `PostPag
 <Route path="/post/:id" page={PostPage} name="post" />
 ```
 
-Hammer calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ and let me reference it later."
+Notice the `:id`. Hammer calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
 
 Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Hammer time!
 
@@ -605,9 +605,9 @@ Cool, cool, cool. But now we need to construct a link that has the ID of a post 
 <Link to={routes.post({ id: post.id })}>{post.title}</Link>
 ```
 
-For routes with route parameters, the `routes` helper expects an object where you specify a value for each parameter. If you click on the link now, it will indeed take you to `/post/1` (or similar, depending on the ID of the post).
+For routes with route parameters, the named route function expects an object where you specify a value for each parameter. If you click on the link now, it will indeed take you to `/post/1` (or `/post/2`, etc, depending on the ID of the post).
 
-Ok, so the ID is in the URL. What do we need next in order to display a post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
+Ok, so the ID is in the URL. What do we need next in order to display a specific post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
     hammer generate cell post
 
@@ -722,9 +722,9 @@ const Post = () => {
 export default Post
 ```
 
-> You may notice we don't have any explict `import` statements for `react` itself. We (the Hammer dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you! We do the same thing with `routes` and a few other packages that are used in lots of places.
+> You may notice we don't have any explict `import` statements for `React` itself. We (the Hammer dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you!
 
-Let's take the post display code out of `PostsCell` and put it here instead, passing the `post` in as a prop:
+Let's take the post display code out of `PostsCell` and put it here instead, taking the `post` in as a prop:
 
 ```javascript
 // web/src/components/Post/Post.js
