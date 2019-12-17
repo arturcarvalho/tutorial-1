@@ -1256,11 +1256,11 @@ Thanks to Photon it takes very little code to actually save something to the dat
 
 Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `hammer dev`.
 
-### GraphiQL
+### GraphQL Playground
 
 Often it's nice to experiment and call your API in a more "raw" form before you get too far down the path of implementation only to find out something is missing. Is there a typo in the API layer or the web layer? Let's find out by accessing just the API layer.
 
-When you started development with `hammer dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is GraphiQL, a web-based GUI for GraphQL APIs.
+When you started development with `hammer dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
 
 ![image](https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png)
 
@@ -1268,7 +1268,7 @@ Not very exciting yet, but check out that "Docs" tab on the far right:
 
 ![image](https://user-images.githubusercontent.com/300/70951080-490ac280-2017-11ea-88f7-7d262cdfa104.png)
 
-It's the complete schema as defined by our SDL files! GraphiQL will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
+It's the complete schema as defined by our SDL files! The Playground will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
 
 ![image](https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png)
 
@@ -1277,13 +1277,175 @@ We should also be able to create a new contact:
 ![image](https://user-images.githubusercontent.com/300/70951633-c125b800-2018-11ea-9b65-e4772ef2dfd9.png)
 [screenshot not final]
 
-GraphiQL is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
+The GraphQL Playground is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
 
 ### Creating a Contact
 
-* Call migration in ContactPage
-* Simulate server error (remove validation on client form field so server blows up)
-  * Demonstrates remaining HammerForm functionality—showing server error
+Our GraphQL mutation is ready to go on the backend so all that's left is to invoke it on the frontend. Everything related to our form is in `ContactPage` so that's the logical place to put the mutation call. First we define the mutation as a constant that we call later:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const CREATE_CONTACT = gql`
+  mutation {
+    createContact(input: $input) {
+      id
+    }
+  }
+`
+```
+
+We reference the `createContact` mutation we defined in the Contacts SDL passing it an `input` object which will contain the actual name, email and message fields.
+
+Next we'll call the `useMutation` hook provided by Apollo which will allow us to execute the mutation when we're ready and also capture the loading and error states once the call is made:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const [create] = useMutation(CREATE_CONTACT)
+
+  const onSubmit = (data) {
+    console.log(data)
+  }
+
+  return (...)
+}
+```
+
+`create` is a function that invokes the mutation and takes an object with a `variables` key, containting another object with an `input` key. As an example, we could call it like:
+
+```javascript
+create({
+  variables: {
+    input: {
+      name: 'Rob',
+      email: 'rob@hammerframework.com',
+      message: 'I love hammer!'
+    }
+  }
+})
+```
+
+If you'll recall `<HammerForm>` gives us all of the fields in a nice object where the key is the name of the field, which means the `data` object we're receiving in `onSubmit` is already in the proper format that we need for the `input`!
+
+Now we can update the `onSubmit` function to invoke the mutation with the data it receives:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const [create] = useMutation(CREATE_CONTACT)
+
+  const onSubmit = (data) {
+    create({ variables: { input: data }})
+  }
+
+  return (...)
+}
+```
+
+Try filling out the form and submitting—you should have a new Contact in the database!
+
+### Improving the Contact Form
+
+Our contact form works but it has a couple of issues at the moment:
+
+* Clicking the submit button multiple times will result in multiple submits
+* The user has no idea if their submission was successful
+* If an error was to occur on the server, we have no way of notifying the user
+
+Let's address these issues.
+
+The `useMutation` hook returns a couple more elements along with the function to invoke it. We can destructure these as the second element in the array that's returned. The two we care about are `loading` and `error`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const [create, { loading, error }] = useMutation(CREATE_CONTACT)
+
+  const onSubmit = (data) {
+    create({ variables: { input: data }})
+  }
+
+  return (...)
+}
+```
+
+Now we know if the database call is still in progress by looking at `loading`. An easy fix for our multiple submit issue would be to disable the submit button if the response is still in progress. We can set the `disabled` attribute on the "Save" button to the value of `loading`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  // ...
+  <Submit style={{ display: 'block' }} disabled={loading}>Save</Submit>
+  // ...
+)
+```
+
+It may be hard to see a difference in development because the submit is so fast, but you could enable network throttling via the Network tab Chrome's Web Inspector to simulate a slow connection:
+
+![image](https://user-images.githubusercontent.com/300/71037869-6dc56f80-20d5-11ea-8b26-3dadb8a1ed86.png)
+
+Next let's let the user know their submission was successful. `useMutation` can accept a second argument containing an options object. One of those options is a callback function that will be invoked when the mutation successfully completes called `onCompleted`. We'll use that callback to notify the user via a simple alert box:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
+  onCompleted: () => {
+    alert('Thank you for your submission!')
+  }
+})
+```
+
+Finally, let's let the user know if a server error occurs. We already capture any existing error in the `error` constant that we got from `useMutation`, so we _could_ maually display an error box on the page somewhere containing those errors, maybe at the top of the form:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+  { error && (
+    <div style={{ color: 'red' }}>We couldn't send your message: {error}</div>
+  )}
+  // ...
+```
+
+To get a server error to fire, let's remove the validation on one of the fields in the form, like `name`. Remember that `name` is required in the database and GraphQL schema, so if we don't submit one we should get an error from GraphQL. Update the `<TextField>` for `name`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<TextField name="name"
+           style={{ display: 'block' }}
+           errorStyle={{ borderColor: 'red' }} />
+```
+
+If you submit the form without a `name` you should see an error appear at the top of the form:
+
+[screenshot]
+
+It ain't pretty, but it works. Seeing a backtrace in our error is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
+
+Remember when we said that `<HammerForm>` had one more trick up its sleeve? Here it comes!
+
+Remove the inline error display we just added (`{ error && ...`) and try passing the `error` constant to `<HammerForm>`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
+```
+
+Now submit a message without a name:
+
+[screenshot]
+
+We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long. The user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
+
+The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
 ## Administration
 
