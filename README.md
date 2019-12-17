@@ -1155,7 +1155,7 @@ Finally, you know what would *really* be nice: if the fields were validated as s
 <HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
 ```
 
-Well, what do you think? Was it worth the hype? I couple new components and you've got forms that handle validation and wrap up submitted values in a nice data object, all for free.
+Well, what do you think? Was it worth the hype? A couple of new components and you've got forms that handle validation and wrap up submitted values in a nice data object, all for free.
 
 > Hammer's forms are built on top of [React Hook Form](https://react-hook-form.com/) so there is even more functionality available than we've documented here.
 
@@ -1165,20 +1165,137 @@ Having a contact form is great, but only if you actually get the contact somehow
 
 ## Saving Data
 
-- Create migration
-- lift up
-- Generate SDL
-- Create service
-- Simulate server error (remove validation on client form field so server blows up)
+Let's add a new database table. Open up `schema.prisma` and add a Contact table:
+
+```javascript
+// api/prisma/schema.prisma
+
+model Contact {
+  id    Int @id
+  name String
+  email String
+  message String
+  createdAt DateTime @default(now())
+}
+```
+
+We've added a `createdAt` table that isn't referenced in the UI at all, but it will default to a timestamp of whenever the record is created so we know when someone filled out the form. By default each column will be required by the database.
+
+> To mark a column as optional (that is, allowing `NULL` as a value) you can suffix the datatype with question mark: `name String?`
+
+Next we create a migration file:
+
+    yarn db:save
+
+The command will ask for a name again. How about "create contact"? Finally we execute the migration to run the DDL commands to upgrade the database:
+
+    yarn db:up
+
+Now we'll great the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
+
+    hammer generate sdl contact
+
+Just like the `scaffold` command, this will create two new files under the `api` directory:
+
+1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language (thus the `.sdl` in the filename)
+2. `api/src/services/contacts.js`: the Hammer's ideal container for data retrieval in your app
+
+Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containting each database field in the table:
+
+```javascript
+// api/src/graphql/contacts.sdl.js
+
+type Contact {
+  id: String!
+  name: String!
+  email: String!
+  message: String!
+  createdAt: DateTime!
+}
+
+type ContactInput {
+  name: String!
+  email: String!
+  message: String!
+}
+```
+
+What's `ContactInput`? Hammer follows the Apollo recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
+
+> Hammer assumes your code won't try to set a value on any field named `id` or `createdAt` so it left those out of the `ContactInput` type, but if your database allowed either of those to be set manually you can update `ContactInput` and add them.
+
+Since all of the DB columns were required in the schema.prisma file they are marked as required here (the `!` suffix on the datatype).
+
+As described in [Side Quest: How Hammer Deals with Data](#) there are no explict resolvers defined in the SDL file. Hammer follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
+
+In this case we're creating a single `Mutation` that we'll call `createContact`. Add that to the end of the SDL file:
+
+```javascript
+// api/src/graphql/contacts.sdl.js
+
+type Mutation {
+  createContact(input: ContactInput!): Contact
+}
+```
+
+The `createContact` mutation will accept a single variable, `input`, that is an object that conforms to what we expect for a `ContactInput`, namely `{ name, email, message }`.
+
+That's it for the SDL file, let's define the service that will actually save the data to the database:
+
+```javascript
+// api/src/services/contacts.js
+const Contacts = {
+  createContact: ({ input }) => {
+    return photon.contacts.create({ data: input })
+  }
+```
+
+Thanks to Photon it takes very little code to actually save something to the database! This is an asynchronous call but we didn't have to worry about resolving Promises or dealing with `async/await`. Apollo will do that for us!
+
+Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `hammer dev`.
+
+### GraphiQL
+
+Often it's nice to experiment and call your API in a more "raw" form before you get too far down the path of implementation only to find out something is missing. Is there a typo in the API layer or the web layer? Let's find out by accessing just the API layer.
+
+When you started development with `hammer dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is GraphiQL, a web-based GUI for GraphQL APIs.
+
+![image](https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png)
+
+Not very exciting yet, but check out that "Docs" tab on the far right:
+
+![image](https://user-images.githubusercontent.com/300/70951080-490ac280-2017-11ea-88f7-7d262cdfa104.png)
+
+It's the complete schema as defined by our SDL files! GraphiQL will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
+
+![image](https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png)
+
+We should also be able to create a new contact:
+
+![image](https://user-images.githubusercontent.com/300/70951633-c125b800-2018-11ea-9b65-e4772ef2dfd9.png)
+[screenshot not final]
+
+GraphiQL is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
+
+### Creating a Contact
+
+* Call migration in ContactPage
+* Simulate server error (remove validation on client form field so server blows up)
+  * Demonstrates remaining HammerForm functionality—showing server error
 
 ## Administration
 
-- Move original post scaffold to /admin
-- Authentication to lock down access
-- First deploy so that we can setup Netlify identity
+* Move original post scaffold to /admin
+* Authentication to lock down access
+* First deploy so that we can setup Netlify identity
 
 ## Deployment
 
-- Branch deploys
-- Netlify forms
-- Custom functions
+* Branch deploys
+* Netlify forms
+* Custom functions
+
+# Cookbook Stuff
+
+Use third party API
+Use third party GraphQL service
