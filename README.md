@@ -594,10 +594,10 @@ If you reload and click the link you should see the boilerplate text on `PostPag
 ```javascript
 // web/src/Routes.js
 
-<Route path="/post/:id" page={PostPage} name="post" />
+<Route path="/post/{id}" page={PostPage} name="post" />
 ```
 
-Notice the `:id`. Hammer calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
+Notice the `{id}`. Hammer calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
 
 Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Hammer time!
 
@@ -633,7 +633,7 @@ const PostPage = () => {
 export default PostPage
 ```
 
-Now over to the cell, we need access to that `:id` route param so we can look up the ID of the post in the database. Let's update the query to accept a variable:
+Now over to the cell, we need access to that `{id}` route param so we can look up the ID of the post in the database. Let's update the query to accept a variable:
 
 ```javascript
 // web/src/cells/PostCell/PostCell.js
@@ -672,7 +672,7 @@ const PostPage = ({ id }) => {
 }
 ```
 
-`id` already exists since we named our route param `:id`. Thanks Hammer! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Hammer by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
+`id` already exists since we named our route param `{id}`. Thanks Hammer! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Hammer by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
 I'll prove it! Just reload the browser and—uh oh. Hmm. Okay that's not our fault. This little bug is brought to us by the original HTTP spec: everything in the URL is considered a string, but GraphQL wants an integer for the ID. So in this case we'll need to convert it before it's turned into a variable for GraphQL. Luckily we've got a nice place to do that: as it's passed into the cell:
 
