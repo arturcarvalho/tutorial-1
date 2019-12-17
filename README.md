@@ -1,5 +1,7 @@
 # Hammer Tutorial
 
+> This tutorial is aspirational and helps us plan Hammer development. Please consider it read-only for now as much of the featured functionality is still being built.
+
 Welcome to Hammer! If you haven't yet, check out the [Hammer README](https://github.com/hammerframework/hammer/blob/master/README.md) to get a little background on why we created Hammer and the problems it's meant to solve. Hammer brings several existing technologies together for the first time into what we think is the future of single page applications.
 
 In this tutorial we're going to build a blog engine. In reality a blog is probably not the ideal candidate for a Hammer app: blog articles can be stored in a CMS and statically generated to HTML files and served as flat files from a CDN. But as most developers are familiar with a blog and it uses all of the features we want to demonstrate, we decided to build one anyway.
