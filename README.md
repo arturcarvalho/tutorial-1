@@ -1227,7 +1227,7 @@ Let's add a new database table. Open up `schema.prisma` and add a Contact table:
 // api/prisma/schema.prisma
 
 model Contact {
-  id    Int @id
+  id Int @id
   name String
   email String
   message String
