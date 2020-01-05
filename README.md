@@ -1,10 +1,10 @@
-# Hammer Tutorial
+# Redwood Tutorial
 
-> This tutorial is aspirational and helps us plan Hammer development. Please consider it read-only for now as much of the featured functionality is still being built.
+> This tutorial is aspirational and helps us plan Redwood development. Please consider it read-only for now as much of the featured functionality is still being built.
 
-Welcome to Hammer! If you haven't yet, check out the [Hammer README](https://github.com/hammerframework/hammer/blob/master/README.md) to get a little background on why we created Hammer and the problems it's meant to solve. Hammer brings several existing technologies together for the first time into what we think is the future of single page applications.
+Welcome to Redwood! If you haven't yet, check out the [Redwood README](https://github.com/redwoodjs/redwood/blob/master/README.md) to get a little background on why we created Redwood and the problems it's meant to solve. Redwood brings several existing technologies together for the first time into what we think is the future of single page applications.
 
-In this tutorial we're going to build a blog engine. In reality a blog is probably not the ideal candidate for a Hammer app: blog articles can be stored in a CMS and statically generated to HTML files and served as flat files from a CDN. But as most developers are familiar with a blog and it uses all of the features we want to demonstrate, we decided to build one anyway.
+In this tutorial we're going to build a blog engine. In reality a blog is probably not the ideal candidate for a Redwood app: blog articles can be stored in a CMS and statically generated to HTML files and served as flat files from a CDN. But as most developers are familiar with a blog and it uses all of the features we want to demonstrate, we decided to build one anyway.
 
 ## Prerequisites
 
@@ -14,24 +14,24 @@ This tutorial assumes you are already familiar with a few core concepts:
 - [GraphQL](https://graphql.org/)
 - [The JAMstack](https://jamstack.org/)
 
-You could work through this tutorial without knowing anything about these technologies but you may find yourself getting lost in terminology that we don't stop and take the time to explain. It also helps knowing where the line is between what is built into React and what additional features Hammer brings to the table.
+You could work through this tutorial without knowing anything about these technologies but you may find yourself getting lost in terminology that we don't stop and take the time to explain. It also helps knowing where the line is between what is built into React and what additional features Redwood brings to the table.
 
 ## Installation & Starting Development
 
-We have a set of command line tools that aids in creating various parts of your Hammer app. Install with either `node` or `yarn` (the rest of this guide assumes Yarn):
+We have a set of command line tools that aids in creating various parts of your Redwood app. Install with either `node` or `yarn` (the rest of this guide assumes Yarn):
 
-    yarn global add @hammerframework/hammer-cli
+    yarn global add @redwoodjs/redwood-cli
 
-Note that we install `hammer-cli` globally so that we can create apps from scratch rather than creating a directory and adding it to just that project. Now you can use the Hammer command line tools everywhere. Let's use it right now to create the basic structure of our app:
+Note that we install `redwood-cli` globally so that we can create apps from scratch rather than creating a directory and adding it to just that project. Now you can use the Redwood command line tools everywhere. Let's use it right now to create the basic structure of our app:
 
-    hammer new hammerblog
+    redwood new redwoodblog
 
-After some commands fly by you'll have a new directory `hammerblog` containing several directories and files. Change to that directory and let's start the development server:
+After some commands fly by you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
 
-    cd hammerblog
-    hammer dev
+    cd redwoodblog
+    redwood dev
 
-Your browser should open to http://localhost:8910 and show the Hammer welcome page:
+Your browser should open to http://localhost:8910 and show the Redwood welcome page:
 
 [screenshot]
 
@@ -40,13 +40,13 @@ We've already initialized a git repo for you so you may want to save the current
     git add .
     git commit -am 'First commit'
 
-## Hammer File Structure
+## Redwood File Structure
 
 Let's take a look at the files and directories that were created for us (config files have been excluded for now):
 
-<img src="https://user-images.githubusercontent.com/300/70482979-05a2d800-1a9c-11ea-9a38-b3ead0f3b5f1.png" alt="hammerblog directory structure" style="width: 300px">
+<img src="https://user-images.githubusercontent.com/300/70482979-05a2d800-1a9c-11ea-9a38-b3ead0f3b5f1.png" alt="redwoodblog directory structure" style="width: 300px">
 
-At the top level we have two directories, `api` and `web`. Hammer separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. Yarn refers to these as "workspaces". When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
+At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. Yarn refers to these as "workspaces". When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
 
     yarn workspace web add marked
     yarn workspace api add better-fs
@@ -62,35 +62,35 @@ Within `api` there are two directories:
   If your app doesn't need access to a SQL-like database then you can delete the `prisma` directory completely and even remove the `prisma2` package.
 
 - `src` contains all other backend code. `api/src` contains three more directories:
-  - `functions` will contain any lambda functions your app needs in addition to the `graphql.js` file auto-generated by Hammer. This file is required to use the GraphQL API. If you don't need GraphQL you can remove this function completely (and remove the `apollo` package).
+  - `functions` will contain any lambda functions your app needs in addition to the `graphql.js` file auto-generated by Redwood. This file is required to use the GraphQL API. If you don't need GraphQL you can remove this function completely (and remove the `apollo` package).
   - `graphql` contains your GraphQL schema (SDL) and resolvers.
   - `services` contains business logic related to your data. When you're querying or mutating data for GraphQL, that code ends up here, but in a format that's resuable in other places in your application.
 
 That's it for the backend. Let's take a look at the frontend `web` directory:
 
-- `components` contain your traditional React components as well as Hammer _Cells_.
+- `components` contain your traditional React components as well as Redwood _Cells_.
 - `layouts` contain HTML/components that wrap your content and are shared across pages.
 - `pages` contain components and are optionally wrapped inside layouts and are the "landing page" for a given URL (a URL like `/articles/hello-world` will map to one page and `/contact-us` will map to another). There are two pages included in a new app:
   - `NotFoundPage.js` will be served when no other route is found (see `Routes.js` below).
   - `FatalErrorPage.js` will be rendered when there is an uncaught error that can't be recovered from and would otherwise cause our application to really blow up (normally rendering a blank page).
 - `index.html` is the standard React starting point for our app.
-- `index.js` contains the bootstraping code to get our Hammer app up and running.
+- `index.js` contains the bootstraping code to get our Redwood app up and running.
 - `Routes.js` contains the route definitions for our app which map a URL to a _Page_
 
 ## Our First Page
 
-Let's give our users something to look at besides the Hammer welcome page. We'll use the `hammer` command line tool to create a page for us:
+Let's give our users something to look at besides the Redwood welcome page. We'll use the `redwood` command line tool to create a page for us:
 
-    hammer generate page home /
+    redwood generate page home /
 
 This does two things:
 
-- Creates `/web/src/pages/HomePage/HomePage.js`. Hammer takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
+- Creates `/web/src/pages/HomePage/HomePage.js`. Redwood takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
 - Adds a `<Route>` in `/web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
-> If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Hammer automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up our routes file.
+> If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Redwood automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up our routes file.
 
-In fact this page is already live. If you reload your browser you should see this new page instead of the Hammer welcome page:
+In fact this page is already live. If you reload your browser you should see this new page instead of the Redwood welcome page:
 
 ![image](https://user-images.githubusercontent.com/300/70487560-9b456400-1aaa-11ea-8dd1-d74fa4123154.png)
 
@@ -102,29 +102,29 @@ Try changing the route to something like:
 
     <Route path="/hello" page={HomePage} name="home" />
 
-When the browser reloads, you'll see the `NotFoundPage` page. As soon as you add your first route, you'll never see the Hammer splash screen again. From now on, when no route can be found that matches the requested URL, Hammer will render the `NotFoundPage`. Change your URL to `http://localhost:8910/hello" and you should see our page again.
+When the browser reloads, you'll see the `NotFoundPage` page. As soon as you add your first route, you'll never see the Redwood splash screen again. From now on, when no route can be found that matches the requested URL, Redwood will render the `NotFoundPage`. Change your URL to `http://localhost:8910/hello" and you should see our page again.
 
 Change the route path back to `/` before continuing!
 
 ## A Second Page and a Link
 
-Let's create an "About" page for our blog so everyone knows about the geniuses behind this achievement. We'll create another page using `hammer`:
+Let's create an "About" page for our blog so everyone knows about the geniuses behind this achievement. We'll create another page using `redwood`:
 
-    hammer generate page about
+    redwood generate page about
 
-> Notice that we didn't specify a route path this time. If you leave it off the `hammer generate page` command, Hammer will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be `/about`.
+> Notice that we didn't specify a route path this time. If you leave it off the `redwood generate page` command, Redwood will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be `/about`.
 
 http://localhost:8910/about should show our new page. But no one's going to find it by manually changing the URL so let's add a link from our homepage to the About page and vice versa. We'll start creating a simple header and nav bar at the same time:
 
 ```javascript
 // web/src/pages/HomePage/HomePage.js
 
-import { Link, routes } from 'src/lib/HammerRouter'
+import { Link, routes } from '@redwoodjs/router'
 
 const HomePage = () => {
   return (
     <header>
-      <h1>Hammer Blog</h1>
+      <h1>Redwood Blog</h1>
       <nav>
         <ul>
           <li><Link to={routes.about()}>About</Link></li>
@@ -142,24 +142,24 @@ export default HomePage
 
 Let's point out a few things here:
 
-- Hammer loves [Function Components](https://www.robinwieruch.de/react-function-component). We'll make extensive use of [React Hooks](https://reactjs.org/docs/hooks-intro.html) as we go and these are only enabled in function components. You're free to use class components, but we recommend avoiding them unless you need their special capabilities.
-- Hammer's `<Link>` tag, in its most basic usage, takes a single `to` attribute. That `to` attribute calls a _named route function_ in order to generate the correct URL. The function has the same name as the `name` attribute on the `<Route>`:
+- Redwood loves [Function Components](https://www.robinwieruch.de/react-function-component). We'll make extensive use of [React Hooks](https://reactjs.org/docs/hooks-intro.html) as we go and these are only enabled in function components. You're free to use class components, but we recommend avoiding them unless you need their special capabilities.
+- Redwood's `<Link>` tag, in its most basic usage, takes a single `to` attribute. That `to` attribute calls a _named route function_ in order to generate the correct URL. The function has the same name as the `name` attribute on the `<Route>`:
 
   `<Route path="/about" page={AboutPage} name="about" />`
 
-  If you don't like the name that `hammer generate` used for your route, feel free to change it in `Routes.js`! Named routes are awesome because if you ever change the path associated with a route, you need only change it in `Routes.js` and every link using a named route function will still point to the correct place. You can also pass a string to the `to` attribute, but you'll lose out on all the Hammer goodness that named routes provide.
+  If you don't like the name that `redwood generate` used for your route, feel free to change it in `Routes.js`! Named routes are awesome because if you ever change the path associated with a route, you need only change it in `Routes.js` and every link using a named route function will still point to the correct place. You can also pass a string to the `to` attribute, but you'll lose out on all the Redwood goodness that named routes provide.
 
 Once we get to the About page we don't have any way to get back so let's add a link there as well:
 
 ```javascript
 // web/src/pages/AboutPage/AboutPage.js
 
-import { Link, routes } from 'src/lib/HammerRouter'
+import { Link, routes } from '@redwoodjs/router'
 
 const AboutPage = () => {
   return (
     <header>
-      <h1>Hammer Blog</h1>
+      <h1>Redwood Blog</h1>
       <nav>
         <ul>
           <li><Link to={routes.about()}>About</Link></li>
@@ -168,7 +168,7 @@ const AboutPage = () => {
     </header>
     <main>
       <p>
-        This site was created to demonstrate my mastery of Hammer:
+        This site was created to demonstrate my mastery of Redwood:
         Look on my works, ye mighty, and despair!
       </p>
       <Link to={routes.home()}>Return home</Link>
@@ -181,7 +181,7 @@ export default AboutPage
 
 Great! Try that out in the browser and verify you can get back and forth.
 
-As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tick. We feel you. That's why Hammer has a little something called _Layouts_.
+As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tick. We feel you. That's why Redwood has a little something called _Layouts_.
 
 ## Layouts
 
@@ -193,7 +193,7 @@ When you look at these two pages what do they really care about? They have some 
 
 Let's create a component to hold that `<header>`:
 
-    hammer generate layout blog
+    redwood generate layout blog
 
 That created `/web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
 
@@ -202,12 +202,12 @@ Cut the `<header>` from both `HomePage` and `AboutPage` and add it to the layout
 ```javascript
 // web/src/layouts/BlogLayout/BlogLayout.js
 
-import { Link, routes } from 'src/lib/HammerRouter'
+import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
     <header>
-      <h1>Hammer Blog</h1>
+      <h1>Redwood Blog</h1>
       <nav>
         <ul>
           <li><Link to={routes.about()}>About</Link></li>
@@ -236,14 +236,14 @@ const HomePage = () => {
 export default HomePage;
 
 // web/src/pages/AboutPage/AboutPage.js
-import { Link, routes } from "src/lib/HammerRouter";
+import { Link, routes } from "@redwoodjs/router";
 import BlogLayout from "src/layouts/BlogLayout";
 
 const AboutPage = () => {
   return (
     <BlogLayout>
       <p>
-        This site was created to demonstrate my mastery of Hammer: Look on my works, ye mighty, and
+        This site was created to demonstrate my mastery of Redwood: Look on my works, ye mighty, and
         despair!
       </p>
       <Link to={routes.home()}>Return home</Link>
@@ -258,7 +258,7 @@ Back to the browser and you should see...nothing different. But that's good, it 
 
 > ### Why are things named the way they are?
 >
-> You may have noticed some duplication in Hammer's file names. Pages live in a directory called `/pages` and also contain `Page` in their name. Same with Layouts. What's the deal?
+> You may have noticed some duplication in Redwood's file names. Pages live in a directory called `/pages` and also contain `Page` in their name. Same with Layouts. What's the deal?
 >
 > When you have dozens of files open in your editor it's easy to get lost, especially when you have several files with names that are similar or even the same (they happen to be in different directories). We've found that the extra duplication in the names of files is worth the productivity benefit when scanning through your open tabs.
 >
@@ -271,12 +271,12 @@ One more `<Link>`, let's have the title/logo link back to the homepage as per us
 ```javascript
 // web/src/layouts/BlogLayout/BlogLayout.js
 
-import { Link, routes } from 'src/lib/HammerRouter'
+import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
     <header>
-      <h1><Link to={routes.home()}>Hammer Blog</Link></h1>
+      <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
         <ul>
           <li><Link to={routes.about()}>About</Link></li>
@@ -296,7 +296,7 @@ export default BlogLayout
 
 These two pages are great and all but where are the actual blog posts in this blog? Let's work on those next.
 
-For the purposes of our tutorial we're going to get our blog posts from a database. Because relational databases are still the workhorses of many complex (and not-so-complex) web applications, we've made SQL access a first-class citizen. For Hammer apps, it all starts with the schema.
+For the purposes of our tutorial we're going to get our blog posts from a database. Because relational databases are still the workhorses of many complex (and not-so-complex) web applications, we've made SQL access a first-class citizen. For Redwood apps, it all starts with the schema.
 
 ### Creating the Database Schema
 
@@ -322,23 +322,23 @@ model Post {
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    hammer db:save
+    redwood db:save
 
-When it asks what you want to name this migration its for your own benefit—neither Hammer nor Photon care about the migration's name. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory under `/api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Lift will use make the change to the database in `steps.json`).
+When it asks what you want to name this migration its for your own benefit—neither Redwood nor Photon care about the migration's name. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory under `/api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Lift will use make the change to the database in `steps.json`).
 
 We apply the migration with another command:
 
-    hammer db:up
+    redwood db:up
 
 Since this is the first time this command has been run you'll be asked if you want to create the database (yes, you do). It will create a SQLite file at `/api/prisma/dev.db` and then apply the migration, creating a new table called `Post` with the fields we defined above.
 
 ### Scaffolding a Post Editor
 
-We haven't decided on the look and feel of our site yet, but wouldn't it be amazing if we could play around with posts without having to build a bunch of pages that we'll probably throw away once the design team gets back to us? Lucky for us, "Amazing" is Hammer's middle name! It has no last name.
+We haven't decided on the look and feel of our site yet, but wouldn't it be amazing if we could play around with posts without having to build a bunch of pages that we'll probably throw away once the design team gets back to us? Lucky for us, "Amazing" is Redwood's middle name! It has no last name.
 
-Let's generate a _scaffold_ that will allow us to perform all the CRUD actions on posts so we can not only verify that we've got the right fields in the database, but let us get some sample posts in there so we can start laying out our pages and see real content. Hammer has a generator for just the occasion:
+Let's generate a _scaffold_ that will allow us to perform all the CRUD actions on posts so we can not only verify that we've got the right fields in the database, but let us get some sample posts in there so we can start laying out our pages and see real content. Redwood has a generator for just the occasion:
 
-    hammer generate scaffold post
+    redwood generate scaffold post
 
 Let's point the browser to `http://localhost:8910/posts` and see what we have:
 
@@ -364,9 +364,9 @@ Okay but what if we click "Delete"?
 
 [screenshot]
 
-So, Hammer just created a complete scaffold for our posts table to allow us to perform all CRUD actions through these simple pages. No need to open a GUI or login through a terminal window and write SQL froms scratch. Pretty neat, right?
+So, Redwood just created a complete scaffold for our posts table to allow us to perform all CRUD actions through these simple pages. No need to open a GUI or login through a terminal window and write SQL froms scratch. Pretty neat, right?
 
-Here's what happened when we ran that `hammer generate scaffold post` command:
+Here's what happened when we ran that `redwood generate scaffold post` command:
 
 - Added an `sdl.js` file to define several GraphQL queries and mutations in `/api/src/graphql/posts.sdl.js`
 - Added a _services_ file in `/api/src/services/posts.js` that makes the Photon calls to get data in and out of the database
@@ -396,7 +396,7 @@ Oh boy, our first page with data and we already have to worry about loading stat
 
 These features are common in most web apps. We wanted to see if there was something we could do to make developers' lives easier when it comes to adding them to a typical component. We think we've come up with something to help. We call them _Cells_. Cells provide a simpler and more declarative approach to data fetching.
 
-When you create a cell you export several specially named constants and then Hammer takes it from there. A typical cell may look something like:
+When you create a cell you export several specially named constants and then Redwood takes it from there. A typical cell may look something like:
 
 ```javascript
 import Post from "src/components/Post";
@@ -427,7 +427,7 @@ export const Success = ({ posts }) => {
 };
 ```
 
-When React renders this component Hammer will:
+When React renders this component Redwood will:
 
 - Perform the `QUERY` and display the `Loader` component until a response is received
 - Once the query returns it will display one of three states:
@@ -437,15 +437,15 @@ When React renders this component Hammer will:
 
 There are also some lifecycle helpers like `beforeQuery` (for massaging any props before being given to the `Query`) and `afterQuery` (for massaging the data returned from GraphQL but before being sent to the `Success` component)
 
-The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. Hammer provides default `Loading` and `Failure` components, but you'll most likely want to provide your own custom displays.
+The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. Redwood provides default `Loading` and `Failure` components, but you'll most likely want to provide your own custom displays.
 
-A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding. Let Hammer worry about juggling what is displayed when and you can focus on the happy path of the final, rendered component populated with data.
+A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding. Let Redwood worry about juggling what is displayed when and you can focus on the happy path of the final, rendered component populated with data.
 
 ### Our First Cell
 
-The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Hammer generator for them:
+The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Redwood generator for them:
 
-    hammer generate cell posts
+    redwood generate cell posts
 
 This command will result in a new file at `/web/src/components/PostsCell/PostsCell.js` with some boilerplate to get you started:
 
@@ -476,7 +476,7 @@ To get you off and running as quickly as possible the generator assumes you've g
 ```javascript
 // web/src/pages/HomePage/HomePage.js
 
-import { Link, routes } from "src/lib/HammerRouter";
+import { Link, routes } from "@redwoodjs/router";
 import BlogLayout from "src/layouts/BlogLayout";
 import PostsCell from "src/components/PostsCell";
 
@@ -558,11 +558,11 @@ To sum up, what did we actually do to get this far?
 6. Create a cell to load the data and take care of loading/empty/failure/success states
 7. Add the cell to the page
 
-This will become a standard lifecycle of new features as you build a Hammer app.
+This will become a standard lifecycle of new features as you build a Redwood app.
 
 So far, other than a little HTML, we haven't had to do much by hand. And we especially didn't have to write a bunch of plumbing just to move data from one place to another. Makes web development a little more enjoyable, don't you think?
 
-## Side Quest: How Hammer Works with Data
+## Side Quest: How Redwood Works with Data
 
 (Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc)
 
@@ -570,7 +570,7 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 
 Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
 
-    hammer generate page post
+    redwood generate page post
 
 Now let's link the title of the post on the homepage to the detail page:
 
@@ -599,9 +599,9 @@ If you reload and click the link you should see the boilerplate text on `PostPag
 <Route path="/post/{id}" page={PostPage} name="post" />
 ```
 
-Notice the `{id}`. Hammer calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
+Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
 
-Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Hammer time!
+Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Redwood time!
 
 ```javascript
 // web/src/pages/PostsPage/PostsPage.js
@@ -613,14 +613,14 @@ For routes with route parameters, the named route function expects an object whe
 
 Ok, so the ID is in the URL. What do we need next in order to display a specific post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
-    hammer generate cell post
+    redwood generate cell post
 
 And then we'll use that cell in `PostPage` (and while we're at it let's surround the page with the `BlogLayout`):
 
 ```javascript
 // web/src/pages/PostPage/PostPage.js
 
-import { Link, routes } from "src/lib/HammerRouter";
+import { Link, routes } from "@redwoodjs/router";
 import BlogLayout from "src/layouts/BlogLayout";
 import PostCell from "src/components/PostCell";
 
@@ -660,7 +660,7 @@ export const Success = ({ post }) => {
 };
 ```
 
-Okay, we're getting closer. Still, where will that `$id` come from? Hammer has another trick up its sleeve. Whenever you put a route param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
+Okay, we're getting closer. Still, where will that `$id` come from? Redwood has another trick up its sleeve. Whenever you put a route param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
 
 ```javascript
 // web/src/pages/PostPage/PostPage.js
@@ -674,7 +674,7 @@ const PostPage = ({ id }) => {
 };
 ```
 
-`id` already exists since we named our route param `{id}`. Thanks Hammer! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Hammer by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
+`id` already exists since we named our route param `{id}`. Thanks Redwood! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Redwood by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
 I'll prove it! Just reload the browser and—uh oh. Hmm. Okay that's not our fault. This little bug is brought to us by the original HTTP spec: everything in the URL is considered a string, but GraphQL wants an integer for the ID. So in this case we'll need to convert it before it's turned into a variable for GraphQL. Luckily we've got a nice place to do that: as it's passed into the cell:
 
@@ -708,11 +708,11 @@ export const Success = ({ post, id, rand }) => {
 };
 ```
 
-> Thanks again, Hammer!
+> Thanks again, Redwood!
 
-Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Hammer-up a component (I just invented that phrase):
+Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Redwood-up a component (I just invented that phrase):
 
-    hammer generate component post
+    redwood generate component post
 
 Which creates `web/src/components/Post/Post.js` as a super simple React component:
 
@@ -726,7 +726,7 @@ const Post = () => {
 export default Post;
 ```
 
-> You may notice we don't have any explict `import` statements for `React` itself. We (the Hammer dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you!
+> You may notice we don't have any explict `import` statements for `React` itself. We (the Redwood dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you!
 
 Let's take the post display code out of `PostsCell` and put it here instead, taking the `post` in as a prop:
 
@@ -770,7 +770,7 @@ Let's summarize:
 1. We created a new page to show a single post (the "detail" page)
 2. We added a route to handle the `id` of the post and turn it into a route param
 3. We created a cell to fetch and display the post
-4. Hammer made the world a better place by making that `id` available to us at several key junctions in our code
+4. Redwood made the world a better place by making that `id` available to us at several key junctions in our code
 5. We turned the actual post display into a standard React component and used it in both the homepage and new detail page.
 
 ## Side Quest: Naming Conventions
@@ -781,7 +781,7 @@ Let's summarize:
 
 ## Everyone's Favorite Thing to Build: Forms
 
-Wait, don't close your browser! You had to know this was coming eventually, didn't you? And you've probably realized by now we wouldn't even have this section in the tutorial unless Hammer had figured out a way to make forms less soul-sucking than usual. In fact Hammer might even make you _love_ building forms. Well, love is a strong word. _Like_ building forms. _Tolerate_ building them?
+Wait, don't close your browser! You had to know this was coming eventually, didn't you? And you've probably realized by now we wouldn't even have this section in the tutorial unless Redwood had figured out a way to make forms less soul-sucking than usual. In fact Redwood might even make you _love_ building forms. Well, love is a strong word. _Like_ building forms. _Tolerate_ building them?
 
 We already have a form or two in our app; remember our posts scaffold? And those work pretty well! How hard can it be? (Hopefully you haven't sneaked a peek at that code—what's coming next will be much more impressive if you haven't yet.)
 
@@ -789,7 +789,7 @@ Let's build the simplest form that still makes sense for our blog, a "contact us
 
 ### The Page
 
-    hammer generate page contact
+    redwood generate page contact
 
 We can put a link to Contact in our header:
 
@@ -799,7 +799,7 @@ We can put a link to Contact in our header:
 const BlogLayout = (props) => {
   return (
     <header>
-      <h1><Link to={routes.home()}>Hammer Blog</Link></h1>
+      <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
         <ul>
           <li><Link to={routes.about()}>About</Link></li>
@@ -816,34 +816,34 @@ const BlogLayout = (props) => {
 
 Double check that everything looks good and then let's get to the good stuff.
 
-### Introducing HammerForm
+### Introducing RedwoodForm
 
 Forms in React are infamously annoying to work with. There are [Controlled Components](https://reactjs.org/docs/forms.html#controlled-components) and [Uncontrolled Components](https://reactjs.org/docs/uncontrolled-components.html) and [third party libraries](https://jaredpalmer.com/formik/) and many more workarounds to try and make forms in React as simple as they were originally intended to be: an `<input>` field with a `name` attribute that gets submitted somewhere when you click a `<button>`.
 
-We think Hammer is a step or two in the right direction by not only freeing you from writing controlled component plumbing, but also dealing with validation and errors automatically. Let's see how it works.
+We think Redwood is a step or two in the right direction by not only freeing you from writing controlled component plumbing, but also dealing with validation and errors automatically. Let's see how it works.
 
-For now we won't be talking to the database in our Contact form so we won't create a cell. Let's create the form right on the page. Hammer forms start with the...wait for it...`<HammerForm>` tag:
+For now we won't be talking to the database in our Contact form so we won't create a cell. Let's create the form right on the page. Redwood forms start with the...wait for it...`<RedwoodForm>` tag:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 const ContactPage = props => {
-  return <HammerForm></HammerForm>;
+  return <RedwoodForm></RedwoodForm>;
 };
 
 export default ContactPage;
 ```
 
-Well that was anticlimactic. You can't even see it in the browser. Let's add a form field so we can at least see something. Hammer ships with several inputs and a plain text input box is `<TextField>`. We'll also give the field a `name` attribute so that once there are multiple inputs on this page we'll know which contains which data:
+Well that was anticlimactic. You can't even see it in the browser. Let's add a form field so we can at least see something. Redwood ships with several inputs and a plain text input box is `<TextField>`. We'll also give the field a `name` attribute so that once there are multiple inputs on this page we'll know which contains which data:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 const ContactPage = props => {
   return (
-    <HammerForm>
+    <RedwoodForm>
       <TextField name="input" />
-    </HammerForm>
+    </RedwoodForm>
   );
 };
 ```
@@ -857,10 +857,10 @@ Something it showing! Still, pretty boring. How about adding a submit button?
 
 const ContactPage = props => {
   return (
-    <HammerForm>
+    <RedwoodForm>
       <TextField name="input" />
       <Submit>Save</Submit>
-    </HammerForm>
+    </RedwoodForm>
   );
 };
 ```
@@ -871,7 +871,7 @@ We have what might actually be considered a real, bonafide form here. Try typing
 
 ### onSubmit
 
-Similar to a plain HTML form we'll give `<HammerForm>` an `onSubmit` handler. That handler will be called with a single argument—an object containing all of the submitted form fields:
+Similar to a plain HTML form we'll give `<RedwoodForm>` an `onSubmit` handler. That handler will be called with a single argument—an object containing all of the submitted form fields:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -882,10 +882,10 @@ const ContactPage = (props) => {
   }
 
   return (
-    <HammerForm onSubmit={onSubmit}>
+    <RedwoodForm onSubmit={onSubmit}>
       <TextField name="input" />
       <Submit>Save</Submit>
-    </HammerForm>
+    </RedwoodForm>
   )
 }
 ```
@@ -900,16 +900,16 @@ Great! Let's turn this into a more useful form by adding a couple fields. We'll 
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <TextField name="name" />
     <TextField name="email" />
     <TextArea name="message" />
     <Submit>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
-See the new `<TextArea>` component here which generates an HTML `<textarea>` but that contains Hammer's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
+See the new `<TextArea>` component here which generates an HTML `<textarea>` but that contains Redwood's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
 
 [screenshot]
 
@@ -919,7 +919,7 @@ Let's add some labels and just a tiny bit of styling to at least separate the fi
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -936,7 +936,7 @@ return (
     <TextArea name="message" style={{ display: "block" }} />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
@@ -946,7 +946,7 @@ That's a little better. Try filling out the form and submitting and you should g
 
 ### Validation
 
-"Okay Hammer tutorial author," you're saying, "what's the big deal? You built up Hammer's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! But anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assumption), what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Hammer, that's who!
+"Okay Redwood tutorial author," you're saying, "what's the big deal? You built up Redwood's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! But anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assumption), what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Redwood, that's who!
 
 All three of these fields should be required in order for someone to send a message to us. Let's enforce that with the standard HTML `required` attribute:
 
@@ -954,7 +954,7 @@ All three of these fields should be required in order for someone to send a mess
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -971,19 +971,19 @@ return (
     <TextArea name="message" style={{ display: "block" }} required />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
 Now when trying to submit there'll be message from the browser noting that a field must be filled in. This is better than nothing, but these messages can't be styled. Can we do better?
 
-Yes! Let's update that `required` call to instead be an object we pass to a custom attribute on Hammer form helpers called `validation`:
+Yes! Let's update that `required` call to instead be an object we pass to a custom attribute on Redwood form helpers called `validation`:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -1000,7 +1000,7 @@ return (
     <TextArea name="message" style={{ display: "block" }} validation={{ required: true }} />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
@@ -1010,7 +1010,7 @@ And now when we submit the form with blank fields...nothing happens. That seems 
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -1030,7 +1030,7 @@ return (
     <FieldError name="message" />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
@@ -1044,7 +1044,7 @@ But this is just the beginning. Let's make sure folks realize this is an error m
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -1064,7 +1064,7 @@ return (
     <FieldError name="message" style={{ color: "red" }} />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
@@ -1076,7 +1076,7 @@ You know what would be nice, if the input itself somehow displayed the fact that
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <label for="name" style={{ display: "block" }}>
       Name
     </label>
@@ -1111,17 +1111,17 @@ return (
     <FieldError name="message" style={{ color: "red" }} />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
-Oooo, what if the _label_ could change as well? It can, but we'll need Hammer's custom `<Label>` component for that (note that `for` becomes `name` just like the other components):
+Oooo, what if the _label_ could change as well? It can, but we'll need Redwood's custom `<Label>` component for that (note that `for` becomes `name` just like the other components):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <HammerForm onSubmit={onSubmit}>
+  <RedwoodForm onSubmit={onSubmit}>
     <Label name="name" style={{ display: "block" }} errorStyle={{ color: "red" }}>
       Name
     </Label>
@@ -1156,7 +1156,7 @@ return (
     <FieldError name="message" style={{ color: "red" }} />
 
     <Submit style={{ display: "block" }}>Save</Submit>
-  </HammerForm>
+  </RedwoodForm>
 );
 ```
 
@@ -1208,14 +1208,14 @@ Finally, you know what would _really_ be nice: if the fields were validated as s
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
 ```
 
 Well, what do you think? Was it worth the hype? A couple of new components and you've got forms that handle validation and wrap up submitted values in a nice data object, all for free.
 
-> Hammer's forms are built on top of [React Hook Form](https://react-hook-form.com/) so there is even more functionality available than we've documented here.
+> Redwood's forms are built on top of [React Hook Form](https://react-hook-form.com/) so there is even more functionality available than we've documented here.
 
-Hammer has one more trick up its sleeve when it comes to forms but we'll save that for when we're actually submitting one to the server.
+Redwood has one more trick up its sleeve when it comes to forms but we'll save that for when we're actually submitting one to the server.
 
 Having a contact form is great, but only if you actually get the contact somehow. Let's create a database table to hold the submitted data and create our first GraphQL mutation.
 
@@ -1249,12 +1249,12 @@ The command will ask for a name again. How about "create contact"? Finally we ex
 
 Now we'll great the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
-    hammer generate sdl contact
+    redwood generate sdl contact
 
 Just like the `scaffold` command, this will create two new files under the `api` directory:
 
 1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language (thus the `.sdl` in the filename)
-2. `api/src/services/contacts.js`: the Hammer's ideal container for data retrieval in your app
+2. `api/src/services/contacts.js`: contains your app's business logic.
 
 Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containting each database field in the table:
 
@@ -1276,13 +1276,13 @@ type ContactInput {
 }
 ```
 
-What's `ContactInput`? Hammer follows the Apollo recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
+What's `ContactInput`? Redwood follows the Apollo recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
 
-> Hammer assumes your code won't try to set a value on any field named `id` or `createdAt` so it left those out of the `ContactInput` type, but if your database allowed either of those to be set manually you can update `ContactInput` and add them.
+> Redwood assumes your code won't try to set a value on any field named `id` or `createdAt` so it left those out of the `ContactInput` type, but if your database allowed either of those to be set manually you can update `ContactInput` and add them.
 
 Since all of the DB columns were required in the schema.prisma file they are marked as required here (the `!` suffix on the datatype).
 
-As described in [Side Quest: How Hammer Deals with Data](#) there are no explict resolvers defined in the SDL file. Hammer follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
+As described in [Side Quest: How Redwood Deals with Data](#) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
 
 In this case we're creating a single `Mutation` that we'll call `createContact`. Add that to the end of the SDL file:
 
@@ -1308,13 +1308,13 @@ const Contacts = {
 
 Thanks to Photon it takes very little code to actually save something to the database! This is an asynchronous call but we didn't have to worry about resolving Promises or dealing with `async/await`. Apollo will do that for us!
 
-Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `hammer dev`.
+Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `redwood dev`.
 
 ### GraphQL Playground
 
 Often it's nice to experiment and call your API in a more "raw" form before you get too far down the path of implementation only to find out something is missing. Is there a typo in the API layer or the web layer? Let's find out by accessing just the API layer.
 
-When you started development with `hammer dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
+When you started development with `redwood dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
 
 ![image](https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png)
 
@@ -1374,14 +1374,14 @@ create({
   variables: {
     input: {
       name: "Rob",
-      email: "rob@hammerframework.com",
-      message: "I love hammer!"
+      email: "rob@redwoodjs.com",
+      message: "I love Redwood!"
     }
   }
 });
 ```
 
-If you'll recall `<HammerForm>` gives us all of the fields in a nice object where the key is the name of the field, which means the `data` object we're receiving in `onSubmit` is already in the proper format that we need for the `input`!
+If you'll recall `<RedwoodForm>` gives us all of the fields in a nice object where the key is the name of the field, which means the `data` object we're receiving in `onSubmit` is already in the proper format that we need for the `input`!
 
 Now we can update the `onSubmit` function to invoke the mutation with the data it receives:
 
@@ -1462,7 +1462,7 @@ Finally, let's let the user know if a server error occurs. We already capture an
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
   { error && (
     <div style={{ color: 'red' }}>We couldn't send your message: {error}</div>
   )}
@@ -1483,14 +1483,14 @@ If you submit the form without a `name` you should see an error appear at the to
 
 It ain't pretty, but it works. Seeing a backtrace in our error is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
 
-Remember when we said that `<HammerForm>` had one more trick up its sleeve? Here it comes!
+Remember when we said that `<RedwoodForm>` had one more trick up its sleeve? Here it comes!
 
-Remove the inline error display we just added (`{ error && ...`) and try passing the `error` constant to `<HammerForm>`:
+Remove the inline error display we just added (`{ error && ...`) and try passing the `error` constant to `<RedwoodForm>`:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<HammerForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
+<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
 ```
 
 Now submit a message without a name:
@@ -1522,7 +1522,7 @@ Next let's making sure only we are accessing these pages.
 
 "Authentication" is a blanket term for all of the stuff that goes into making sure that a user, often identified with an email address and password, is allowed to do something they want to do. Authentication can be [famously fickle](https://www.rdegges.com/2017/authentication-still-sucks/) to do right both from a technical standpoint and developer happiness standpoint.
 
-But you know Hammer has your back! It ships with integration to several popular authentication services. Login isn't something you should have to write from scratch—it's a solved problem and is one less thing we should have to worry about. We include integrations to:
+But you know Redwood has your back! It ships with integration to several popular authentication services. Login isn't something you should have to write from scratch—it's a solved problem and is one less thing we should have to worry about. We include integrations to:
 
 - [Auth0](https://auth0.com/)
 - [Netlify Identity](https://docs.netlify.com/visitor-access/identity/)
@@ -1550,8 +1550,7 @@ Choose which team to associate this new site with (if you happen to have more th
 You can enter a `Site name` or just hit ENTER to get a random one.
 
 And that's it, you should have a new site created in Netlify. You can enter `n`
-when asked if you want to continue. Head to the `Admin URL` that Netlify CLI just
-gave you.
+when asked if you want to continue. Head to the `Admin URL` that Netlify CLI just gave you.
 
 Click on the "Identity" tab and then the "Enable Identity" button:
 
@@ -1561,7 +1560,7 @@ Now copy and paste the API endpoint protocol and domain from the URL that's disp
 
 ![Netlify Identity URL](https://user-images.githubusercontent.com/300/67904521-d196d780-fb2b-11e9-9f17-f2f668d1d29e.png)
 
-For the remainder of the tutorial we're going to run the site in dev mode using Netlify's CLI instead of Hammer's. This gives us the identity functionality we need. Hit `Ctrl-C` to exit out of `hammer dev` and start Netlify's dev mode instead:
+For the remainder of the tutorial we're going to run the site in dev mode using Netlify's CLI instead of Redwood's. This gives us the identity functionality we need. Hit `Ctrl-C` to exit out of `redwood dev` and start Netlify's dev mode instead:
 
     netlify dev
 
