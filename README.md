@@ -20,7 +20,7 @@ You could work through this tutorial without knowing anything about these techno
 
 We have a set of command line tools that aids in creating various parts of your Redwood app. Install with either `node` or `yarn` (the rest of this guide assumes Yarn):
 
-    yarn global add @redwoodjs/redwood-cli
+    yarn global add @redwoodjs/cli
 
 Note that we install `redwood-cli` globally so that we can create apps from scratch rather than creating a directory and adding it to just that project. Now you can use the Redwood command line tools everywhere. Let's use it right now to create the basic structure of our app:
 
