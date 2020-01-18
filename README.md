@@ -35,8 +35,9 @@ Your browser should open to http://localhost:8910 and show the Redwood welcome p
 
 [screenshot]
 
-We've already initialized a git repo for you so you may want to save the current state of the app as your first commit.
+Now that we have the skeleton of our Redwood app in place, it's a good idea to save the current state of the app as your first commit...just in case.
 
+    git init
     git add .
     git commit -am 'First commit'
 
