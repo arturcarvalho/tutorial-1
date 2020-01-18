@@ -677,21 +677,17 @@ const PostPage = ({ id }) => {
 
 `id` already exists since we named our route param `{id}`. Thanks Redwood! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Redwood by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
-I'll prove it! Just reload the browser and—uh oh. Hmm. Okay that's not our fault. This little bug is brought to us by the original HTTP spec: everything in the URL is considered a string, but GraphQL wants an integer for the ID. So in this case we'll need to convert it before it's turned into a variable for GraphQL. Luckily we've got a nice place to do that: as it's passed into the cell:
+I'll prove it! Just reload the browser and—uh oh. Hmm. Okay, it turns out the route param is just extracted as a string from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `PostCell`, but honestly, we can do better than that!
+
+What if you could request the conversion right in the route's path? Well, guess what: you can! Introducing **route param types**. It's as easy as adding `:Int` to our existing route param:
 
 ```javascript
-// web/src/pages/PostPage/PostPage.js
+// web/src/Routes.js
 
-const PostPage = () => {
-  return (
-    <BlogLayout>
-      <PostCell id={parseInt(id)} />
-    </BlogLayout>
-  );
-};
+<Route path="/post/{id:Int}" page={PostPage} name="post" />
 ```
 
-Voilá!
+Voilá! Not only will this convert the `id` param to a number before passing it to your Page, it will prevent the route from matching unless the `id` path segment consists entirely of digits. If any non-digits are found, the router will keep trying other routes, eventually showing the `NotFoundPage` if no routes match.
 
 > **What if I want to pass some other prop to the cell that I don't need in the query, but do need in the Success/Loader/etc. components?**
 >
