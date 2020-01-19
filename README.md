@@ -600,7 +600,7 @@ If you reload and click the link you should see the boilerplate text on `PostPag
 <Route path="/post/{id}" page={PostPage} name="post" />
 ```
 
-Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever value is in this position in the path, call it _this_ (without the colon) and let me reference it later."
+Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever value is in this position in the path, let me reference it by the name inside the curly braces."
 
 Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Redwood time!
 
