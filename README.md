@@ -161,23 +161,25 @@ import { Link, routes } from '@redwoodjs/router'
 
 const AboutPage = () => {
   return (
-  <>
-    <header>
-      <h1>Redwood Blog</h1>
-      <nav>
-        <ul>
-          <li><Link to={routes.about()}>About</Link></li>
-        </ul>
-      </nav>
-    </header>
-    <main>
-      <p>
-        This site was created to demonstrate my mastery of Redwood:
-        Look on my works, ye mighty, and despair!
-      </p>
-      <Link to={routes.home()}>Return home</Link>
-    </main>
-  </>
+    <>
+      <header>
+        <h1>Redwood Blog</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to={routes.about()}>About</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main>
+        <p>
+          This site was created to demonstrate my mastery of Redwood: Look on my
+          works, ye mighty, and despair!
+        </p>
+        <Link to={routes.home()}>Return home</Link>
+      </main>
+    </>
   )
 }
 
@@ -186,7 +188,7 @@ export default AboutPage
 
 Great! Try that out in the browser and verify you can get back and forth.
 
-As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tick. We feel you. That's why Redwood has a little something called _Layouts_.
+As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tic. We feel you. That's why Redwood has a little something called _Layouts_.
 
 ## Layouts
 
@@ -211,19 +213,19 @@ import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
-  <>
-    <header>
-      <h1>Redwood Blog</h1>
-      <nav>
-        <ul>
-          <li><Link to={routes.about()}>About</Link></li>
-        </ul>
-      </nav>
-    </header>
-    <main>
-      { props.children }
-    </main>
-  </>
+    <>
+      <header>
+        <h1>Redwood Blog</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to={routes.about()}>About</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main>{props.children}</main>
+    </>
   )
 }
 
@@ -331,7 +333,7 @@ model Post {
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    redwood db:save
+    yarn db:save
 
 When it asks what you want to name this migration its for your own benefit—neither Redwood nor Photon care about the migration's name. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory under `/api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Lift will use make the change to the database in `steps.json`).
 
