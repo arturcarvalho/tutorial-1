@@ -339,7 +339,7 @@ When it asks what you want to name this migration its for your own benefit—nei
 
 We apply the migration with another command:
 
-    redwood db:up
+    yarn db:up
 
 Since this is the first time this command has been run you'll be asked if you want to create the database (yes, you do). It will create a SQLite file at `/api/prisma/dev.db` and then apply the migration, creating a new table called `Post` with the fields we defined above.
 
