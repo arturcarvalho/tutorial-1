@@ -124,6 +124,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const HomePage = () => {
   return (
+  <>
     <header>
       <h1>Redwood Blog</h1>
       <nav>
@@ -135,6 +136,7 @@ const HomePage = () => {
     <main>
       Home
     </main>
+  </>
   )
 }
 
@@ -159,6 +161,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const AboutPage = () => {
   return (
+  <>
     <header>
       <h1>Redwood Blog</h1>
       <nav>
@@ -174,6 +177,7 @@ const AboutPage = () => {
       </p>
       <Link to={routes.home()}>Return home</Link>
     </main>
+  </>
   )
 }
 
@@ -207,6 +211,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
+  <>
     <header>
       <h1>Redwood Blog</h1>
       <nav>
@@ -218,6 +223,7 @@ const BlogLayout = (props) => {
     <main>
       { props.children }
     </main>
+  </>
   )
 }
 
@@ -276,6 +282,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
+  <>
     <header>
       <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
@@ -287,6 +294,7 @@ const BlogLayout = (props) => {
     <main>
       { props.children }
     </main>
+  </>
   )
 }
 
@@ -795,6 +803,7 @@ We can put a link to Contact in our header:
 
 const BlogLayout = (props) => {
   return (
+  <>
     <header>
       <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
@@ -807,6 +816,7 @@ const BlogLayout = (props) => {
     <main>
       { props.children }
     </main>
+  </>
   )
 }
 ```
