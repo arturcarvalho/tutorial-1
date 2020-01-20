@@ -26,7 +26,7 @@ Note that we install `@redwoodjs/cli` globally so that we can create apps from s
 
     redwood new redwoodblog
 
-After some commands fly by you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
+Redwood uses Prisma 2 with Sqlite under the hood for its database, so Prisma will prompt you to `Create new Sqlite database`. Hit yes and when it is complete, you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
 
     cd redwoodblog
     redwood dev
