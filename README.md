@@ -26,7 +26,7 @@ Note that we install `@redwoodjs/cli` globally so that we can create apps from s
 
     redwood new redwoodblog
 
-After some commands fly by you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
+Redwood uses Prisma 2 with Sqlite under the hood for its database, so Prisma will prompt you to `Create new Sqlite database`. Hit yes and when it is complete, you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
 
     cd redwoodblog
     redwood dev
@@ -47,7 +47,7 @@ Let's take a look at the files and directories that were created for us (config 
 
 <img src="https://user-images.githubusercontent.com/300/70482979-05a2d800-1a9c-11ea-9a38-b3ead0f3b5f1.png" alt="redwoodblog directory structure" style="width: 300px">
 
-At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. Yarn refers to these as "workspaces". When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
+At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. [Yarn refers to these as "workspaces"](https://yarnpkg.com/lang/en/docs/workspaces/). When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
 
     yarn workspace web add marked
     yarn workspace api add better-fs
@@ -124,6 +124,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const HomePage = () => {
   return (
+  <>
     <header>
       <h1>Redwood Blog</h1>
       <nav>
@@ -135,6 +136,7 @@ const HomePage = () => {
     <main>
       Home
     </main>
+  </>
   )
 }
 
@@ -159,21 +161,25 @@ import { Link, routes } from '@redwoodjs/router'
 
 const AboutPage = () => {
   return (
-    <header>
-      <h1>Redwood Blog</h1>
-      <nav>
-        <ul>
-          <li><Link to={routes.about()}>About</Link></li>
-        </ul>
-      </nav>
-    </header>
-    <main>
-      <p>
-        This site was created to demonstrate my mastery of Redwood:
-        Look on my works, ye mighty, and despair!
-      </p>
-      <Link to={routes.home()}>Return home</Link>
-    </main>
+    <>
+      <header>
+        <h1>Redwood Blog</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to={routes.about()}>About</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main>
+        <p>
+          This site was created to demonstrate my mastery of Redwood: Look on my
+          works, ye mighty, and despair!
+        </p>
+        <Link to={routes.home()}>Return home</Link>
+      </main>
+    </>
   )
 }
 
@@ -182,7 +188,7 @@ export default AboutPage
 
 Great! Try that out in the browser and verify you can get back and forth.
 
-As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tick. We feel you. That's why Redwood has a little something called _Layouts_.
+As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tic. We feel you. That's why Redwood has a little something called _Layouts_.
 
 ## Layouts
 
@@ -207,17 +213,19 @@ import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
-    <header>
-      <h1>Redwood Blog</h1>
-      <nav>
-        <ul>
-          <li><Link to={routes.about()}>About</Link></li>
-        </ul>
-      </nav>
-    </header>
-    <main>
-      { props.children }
-    </main>
+    <>
+      <header>
+        <h1>Redwood Blog</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to={routes.about()}>About</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main>{props.children}</main>
+    </>
   )
 }
 
@@ -276,6 +284,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
+  <>
     <header>
       <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
@@ -287,6 +296,7 @@ const BlogLayout = (props) => {
     <main>
       { props.children }
     </main>
+  </>
   )
 }
 
@@ -323,13 +333,13 @@ model Post {
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    redwood db:save
+    yarn db:save
 
 When it asks what you want to name this migration its for your own benefit—neither Redwood nor Photon care about the migration's name. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory under `/api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Lift will use make the change to the database in `steps.json`).
 
 We apply the migration with another command:
 
-    redwood db:up
+    yarn db:up
 
 Since this is the first time this command has been run you'll be asked if you want to create the database (yes, you do). It will create a SQLite file at `/api/prisma/dev.db` and then apply the migration, creating a new table called `Post` with the fields we defined above.
 
@@ -795,6 +805,7 @@ We can put a link to Contact in our header:
 
 const BlogLayout = (props) => {
   return (
+  <>
     <header>
       <h1><Link to={routes.home()}>Redwood Blog</Link></h1>
       <nav>
@@ -807,6 +818,7 @@ const BlogLayout = (props) => {
     <main>
       { props.children }
     </main>
+  </>
   )
 }
 ```
