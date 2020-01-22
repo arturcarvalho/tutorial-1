@@ -18,18 +18,15 @@ You could work through this tutorial without knowing anything about these techno
 
 ## Installation & Starting Development
 
-We have a set of command line tools that aids in creating various parts of your Redwood app. Install with either `node` or `yarn` (the rest of this guide assumes Yarn):
+We'll use yarn ([yarn](https://yarnpkg.com/en/docs/install) is a requirement) to create the basic structure of our app:
 
-    yarn global add @redwoodjs/cli
+    yarn create redwood-app ./redwoodblog
 
-Note that we install `@redwoodjs/cli` globally so that we can create apps from scratch rather than creating a directory and adding it to just that project. Now you can use the Redwood command line tools everywhere. Let's use it right now to create the basic structure of our app:
-
-    redwood new redwoodblog
-
-Redwood uses Prisma 2 with Sqlite under the hood for its database, so Prisma will prompt you to `Create new Sqlite database`. Hit yes and when it is complete, you'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's start the development server:
+You'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's create the database, and then start the development server:
 
     cd redwoodblog
-    redwood dev
+    yarn db:up
+    yarn redwood dev
 
 Your browser should open to http://localhost:8910 and show the Redwood welcome page:
 
@@ -82,7 +79,7 @@ That's it for the backend. Let's take a look at the frontend `web` directory:
 
 Let's give our users something to look at besides the Redwood welcome page. We'll use the `redwood` command line tool to create a page for us:
 
-    redwood generate page home /
+    yarn redwood generate page home /
 
 This does two things:
 
@@ -111,7 +108,7 @@ Change the route path back to `/` before continuing!
 
 Let's create an "About" page for our blog so everyone knows about the geniuses behind this achievement. We'll create another page using `redwood`:
 
-    redwood generate page about
+    yarn redwood generate page about
 
 > Notice that we didn't specify a route path this time. If you leave it off the `redwood generate page` command, Redwood will create a `Route` and give it a path that is the same as the page name you specified prepended with a slash. In this case it will be `/about`.
 
@@ -200,7 +197,7 @@ When you look at these two pages what do they really care about? They have some 
 
 Let's create a component to hold that `<header>`:
 
-    redwood generate layout blog
+    yarn redwood generate layout blog
 
 That created `/web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
 
@@ -349,7 +346,7 @@ We haven't decided on the look and feel of our site yet, but wouldn't it be amaz
 
 Let's generate a _scaffold_ that will allow us to perform all the CRUD actions on posts so we can not only verify that we've got the right fields in the database, but let us get some sample posts in there so we can start laying out our pages and see real content. Redwood has a generator for just the occasion:
 
-    redwood generate scaffold post
+    yarn redwood generate scaffold post
 
 Let's point the browser to `http://localhost:8910/posts` and see what we have:
 
@@ -456,7 +453,7 @@ A guideline for when to use cells is if your component needs some data from the 
 
 The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Redwood generator for them:
 
-    redwood generate cell posts
+    yarn redwood generate cell posts
 
 This command will result in a new file at `/web/src/components/PostsCell/PostsCell.js` with some boilerplate to get you started:
 
@@ -581,7 +578,7 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 
 Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
 
-    redwood generate page post
+    yarn redwood generate page post
 
 Now let's link the title of the post on the homepage to the detail page:
 
@@ -624,7 +621,7 @@ For routes with route parameters, the named route function expects an object whe
 
 Ok, so the ID is in the URL. What do we need next in order to display a specific post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
-    redwood generate cell post
+    yarn redwood generate cell post
 
 And then we'll use that cell in `PostPage` (and while we're at it let's surround the page with the `BlogLayout`):
 
@@ -719,7 +716,7 @@ export const Success = ({ post, id, rand }) => {
 
 Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Redwood-up a component (I just invented that phrase):
 
-    redwood generate component post
+    yarn redwood generate component post
 
 Which creates `web/src/components/Post/Post.js` as a super simple React component:
 
@@ -796,7 +793,7 @@ Let's build the simplest form that still makes sense for our blog, a "contact us
 
 ### The Page
 
-    redwood generate page contact
+    yarn redwood generate page contact
 
 We can put a link to Contact in our header:
 
@@ -1258,7 +1255,7 @@ The command will ask for a name again. How about "create contact"? Finally we ex
 
 Now we'll great the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
-    redwood generate sdl contact
+    yarn redwood generate sdl contact
 
 Just like the `scaffold` command, this will create two new files under the `api` directory:
 
