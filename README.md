@@ -446,7 +446,7 @@ Here's what happened when we ran that `yarn redwood g scaffold post` command:
 > - Layouts are singular
 > - Components, like pages, will be plural or singular depending on context.
 >
-> Also note that it's the database table name that singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
+> Also note that it's the database table name that's singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
 >
 > You don't have to follow this convention once you start creating your own parts but we recommend doing so. The Ruby on Rails community has come to love this nomenclature even though many people complained about it when first exposed to it. [Give it five minutes](https://signalvnoise.com/posts/3124-give-it-five-minutes).
 
