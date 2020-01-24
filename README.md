@@ -360,12 +360,16 @@ generator photonjs {
 }
 
 model Post {
-  id        Int @id
+  id        Int @id @default(autoincrement())
   title     String
   body      String
   createdAt DateTime
 }
 ```
+
+> For the tutorial we're keeping things simple and using an integer for our ID column. Some apps may want to use a GUID or a UUID which Prisma supports. In that case you would use `String` for the datatype instead of `Int` and use `guid()` or `uuid()` instead of `autoincrement()`.
+>
+> Integers also make for nicer URLs like https://redwoodblog.com/posts/123 instead of https://redwoodblog.posts/eebb026c-b661-42fe-93bf-f1a373421a13
 
 ### Migrations
 
