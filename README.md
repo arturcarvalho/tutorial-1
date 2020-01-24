@@ -530,9 +530,9 @@ A guideline for when to use cells is if your component needs some data from the 
 
 The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Redwood generator for them:
 
-    yarn redwood generate cell posts
+    yarn redwood g cell blog_posts
 
-This command will result in a new file at `/web/src/components/PostsCell/PostsCell.js` with some boilerplate to get you started:
+This command will result in a new file at `/web/src/components/BlogPostsCell/BlogPostsCell.js` with some boilerplate to get you started:
 
 ```javascript
 // web/src/components/PostsCell/PostsCell.js
@@ -552,23 +552,31 @@ export const Empty = () => <div>Empty</div>
 export const Failure = ({ message }) => <div>Error: {message}</div>
 
 export const Success = ({ posts }) => {
-  return posts.toString()
+  return JSON.stringify(posts)
 }
 ```
+
+> When generating you can use any case you'd like and Redwood will do the right thing when it comes to naming. These will all create the same filename:
+>
+>     yarn redwood g cell blog_posts
+>     yarn redwood g cell blog-posts
+>     yarn redwood g cell blogPosts
+>     yarn redwood g cell BlogPosts
+>
+> You will need _some_ kind of indication that you're using more than one word. Calling `yarn redwood g cell blogposts` will generate a file at `web/src/components/Blogposts/Blogposts.js`
 
 To get you off and running as quickly as possible the generator assumes you've got a root GraphQL query named the same thing as your cell and gives you the minimum query needed to get something out of the database. Let's plug this into our `HomePage` and see what happens:
 
 ```javascript
 // web/src/pages/HomePage/HomePage.js
 
-import { Link, routes } from '@redwoodjs/router'
 import BlogLayout from 'src/layouts/BlogLayout'
-import PostsCell from 'src/components/PostsCell'
+import BlogPostsCell from 'src/components/BlogPostsCell'
 
 const HomePage = () => {
   return (
     <BlogLayout>
-      <PostsCell />
+      <BlogPostsCell />
     </BlogLayout>
   )
 }
@@ -576,7 +584,7 @@ const HomePage = () => {
 export default HomePage
 ```
 
-Reloading the browser should actually show an array with a number or two (assuming you created a blog post with our [scaffolding](#Scaffolding-a-Post-Editor) from earlier). Neat!
+The browser should actually show an array with a number or two (assuming you created a blog post with our [scaffolding](#Scaffolding-a-Post-Editor) from earlier). Neat!
 
 > **In the `Success` component, where did `posts` come from?**
 >
@@ -597,7 +605,7 @@ export const QUERY = gql`
 In addition to the `id` that was added to the `query` by the generator, let's get the title and body, too:
 
 ```javascript
-// web/src/components/PostsCell/PostsCell.js
+// web/src/components/BlogPostsCell/BlogPostsCell.js
 
 export const QUERY = gql`
   query {
@@ -615,7 +623,7 @@ Reload the page and you should see a dump of all the data you created for any bl
 Now we're in the realm of good ol' React components, so just build out the `Success` component to display the blog post in a nicer format:
 
 ```javascript
-// web/src/components/PostsCell/PostsCell.js
+// web/src/components/BlogPostsCell/BlogPostsCell.js
 
 export const Success = ({ posts }) => {
   return posts.map((post) => (
@@ -649,25 +657,27 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 
 ## Side Quest: How Redwood Works with Data
 
-(Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc)
+(Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc. with some nice graphics.)
 
 ## Displaying a Single Blog Post - Routing Params
 
 Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
 
-    yarn redwood generate page post
+    yarn redwood g page blog_post
+
+> Note that we can't call this page simply `Post` because our scaffold already created a page with that name.
 
 Now let's link the title of the post on the homepage to the detail page:
 
 ```javascript
-// web/src/components/PostsCell/PostsCell.js
+// web/src/components/BlogPostsCell/BlogPostsCell.js
 
 export const Success = ({ posts }) => {
   return posts.map((post) => (
     <article>
       <header>
         <h2>
-          <Link to={routes.post()}>{post.title}</Link>
+          <Link to={routes.blogPost()}>{post.title}</Link>
         </h2>
       </header>
       <div>{post.body}</h2>
@@ -676,57 +686,56 @@ export const Success = ({ posts }) => {
 }
 ```
 
-If you reload and click the link you should see the boilerplate text on `PostPage`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
+If you click the link you should see the boilerplate text on `BlogPostPage`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
 
 ```javascript
 // web/src/Routes.js
 
-<Route path="/post/{id}" page={PostPage} name="post" />
+<Route path="/blog-post/{id}" page={BlogPostPage} name="blogPost" />
 ```
 
 Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever value is in this position in the path, let me reference it by the name inside the curly braces."
 
-Cool, cool, cool. But now we need to construct a link that has the ID of a post in it. Redwood time!
+Cool, cool, cool. Now we need to construct a link that has the ID of a post in it:
 
 ```javascript
-// web/src/pages/PostsPage/PostsPage.js
+// web/src/pages/HomePage/HomePage.js
 
-<Link to={routes.post({ id: post.id })}>{post.title}</Link>
+<Link to={routes.blogPost({ id: post.id })}>{post.title}</Link>
 ```
 
 For routes with route parameters, the named route function expects an object where you specify a value for each parameter. If you click on the link now, it will indeed take you to `/post/1` (or `/post/2`, etc, depending on the ID of the post).
 
 Ok, so the ID is in the URL. What do we need next in order to display a specific post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
-    yarn redwood generate cell post
+    yarn redwood g cell blog_post
 
-And then we'll use that cell in `PostPage` (and while we're at it let's surround the page with the `BlogLayout`):
+And then we'll use that cell in `BlogPostPage` (and while we're at it let's surround the page with the `BlogLayout`):
 
 ```javascript
-// web/src/pages/PostPage/PostPage.js
+// web/src/pages/BlogPostPage/BlogPostPage.js
 
-import { Link, routes } from '@redwoodjs/router'
 import BlogLayout from 'src/layouts/BlogLayout'
-import PostCell from 'src/components/PostCell'
+import BlogPostCell from 'src/components/BlogPostCell'
 
-const PostPage = () => {
+const BlogPostPage = () => {
   return (
     <BlogLayout>
-      <PostCell />
+      <BlogPostCell />
     </BlogLayout>
   )
 }
 
-export default PostPage
+export default BlogPostPage
 ```
 
 Now over to the cell, we need access to that `{id}` route param so we can look up the ID of the post in the database. Let's update the query to accept a variable:
 
 ```javascript
-// web/src/cells/PostCell/PostCell.js
+// web/src/cells/BlogPostCell/BlogPostCell.js
 
 export const Query = gql`
-  query($id: Int) {
+  query($id: Int!) {
     post(id: $id) {
       id
       title
@@ -738,19 +747,19 @@ export const Query = gql`
 And update `Success` to dump the contents of the `post` query so we can see if it worked:
 
 ```javascript
-// web/src/cells/PostCell/PostCell.js
+// web/src/cells/BlogPostCell/BlogPostCell.js
 
 export const Success = ({ post }) => {
-  return post.toString()
+  return JSON.stringify(post)
 }
 ```
 
-Okay, we're getting closer. Still, where will that `$id` come from? Redwood has another trick up its sleeve. Whenever you put a route param in a route, that param is automatically made available to the page that route renders. Which means we can update `PostPage` to look like this:
+Okay, we're getting closer. Still, where will that `$id` come from? Redwood has another trick up its sleeve. Whenever you put a route param in a route, that param is automatically made available to the page that route renders. Which means we can update `BlogPostPage` to look like this:
 
 ```javascript
-// web/src/pages/PostPage/PostPage.js
+// web/src/pages/BlogPostPage/BlogPostPage.js
 
-const PostPage = ({ id }) => {
+const BlogPostPage = ({ id }) => {
   return (
     <BlogLayout>
       <PostCell id={id} />
@@ -761,14 +770,14 @@ const PostPage = ({ id }) => {
 
 `id` already exists since we named our route param `{id}`. Thanks Redwood! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Redwood by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
-I'll prove it! Just reload the browser and—uh oh. Hmm. Okay, it turns out the route param is just extracted as a string from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `PostCell`, but honestly, we can do better than that!
+We can prove it! Take a look at the browser and—uh oh. Hmm. Okay, it turns out that route params are extracted as strings from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `BlogPostCell`, but honestly, we can do better than that!
 
 What if you could request the conversion right in the route's path? Well, guess what: you can! Introducing **route param types**. It's as easy as adding `:Int` to our existing route param:
 
 ```javascript
 // web/src/Routes.js
 
-<Route path="/post/{id:Int}" page={PostPage} name="post" />
+<Route path="/blog-post/{id:Int}" page={BlogPostPage} name="blogPost" />
 ```
 
 Voilá! Not only will this convert the `id` param to a number before passing it to your Page, it will prevent the route from matching unless the `id` path segment consists entirely of digits. If any non-digits are found, the router will keep trying other routes, eventually showing the `NotFoundPage` if no routes match.
@@ -778,7 +787,7 @@ Voilá! Not only will this convert the `id` param to a number before passing it 
 > All of the props you give to the cell will be automatically available as props in the render components. Only the ones that match the GraphQL variables list will be given to the query. You get the best of both worlds! In our post display above, if you wanted to display some random number along with the post (for some contrived, tutorial-like reason), just pass that prop:
 
 ```javascript
-<PostCell id={id} rand={Math.random()}>
+<BlogPostCell id={id} rand={Math.random()}>
 ```
 
 > And get it, along with the query result (and even the original `id` if you want) in the component:
@@ -793,18 +802,18 @@ export const Success = ({ post, id, rand }) => {
 
 Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Redwood-up a component (I just invented that phrase):
 
-    yarn redwood generate component post
+    yarn redwood g component blog_post
 
-Which creates `web/src/components/Post/Post.js` as a super simple React component:
+Which creates `web/src/components/BlogPost/BlogPost.js` as a super simple React component:
 
 ```javascript
-// web/src/components/Post/Post.js
+// web/src/components/BlogPost/BlogPost.js
 
-const Post = () => {
+const BlogPost = () => {
   return null
 }
 
-export default Post
+export default BlogPost
 ```
 
 > You may notice we don't have any explict `import` statements for `React` itself. We (the Redwood dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you!
@@ -812,14 +821,14 @@ export default Post
 Let's take the post display code out of `PostsCell` and put it here instead, taking the `post` in as a prop:
 
 ```javascript
-// web/src/components/Post/Post.js
+// web/src/components/BlogPost/BlogPost.js
 
-const Post = ({ post }) => {
+const BlogPost = ({ post }) => {
   return (
     <article>
       <header>
         <h2>
-          <Link to={routes.post({ id: post.id })}>{post.title}</Link>
+          <Link to={routes.blogPost({ id: post.id })}>{post.title}</Link>
         </h2>
       </header>
       <div>{post.body}</div>
@@ -827,20 +836,20 @@ const Post = ({ post }) => {
   )
 }
 
-export default Post
+export default BlogPost
 ```
 
-And update `PostsCell` and `PostCell` to use this new component instead:
+And update `BlogPostsCell` and `BlogPostCell` to use this new component instead:
 
 ```javascript
-// web/src/components/PostsCell/PostsCell.js
+// web/src/components/BlogPostsCell/BlogPostsCell.js
 export const Success = ({ posts }) => {
-  return posts.map((post) => <Post post={post}>)
+  return posts.map((post) => <BlogPost post={post}>)
 }
 
-// web/src/components/PostCell/PostCell.js
+// web/src/components/BlogPostCell/BlogPostCell.js
 export const Success = ({ post }) => {
-  return <Post post={post}>
+  return <BlogPost post={post}>
 }
 ```
 
@@ -848,10 +857,10 @@ And there we go! We should be able to move back and forth between the homepage a
 
 Let's summarize:
 
-1. We created a new page to show a single post (the "detail" page)
-2. We added a route to handle the `id` of the post and turn it into a route param
-3. We created a cell to fetch and display the post
-4. Redwood made the world a better place by making that `id` available to us at several key junctions in our code
+1. We created a new page to show a single post (the "detail" page).
+2. We added a route to handle the `id` of the post and turn it into a route param.
+3. We created a cell to fetch and display the post.
+4. Redwood made the world a better place by making that `id` available to us at several key junctions in our code and even turning it into a number automatically.
 5. We turned the actual post display into a standard React component and used it in both the homepage and new detail page.
 
 ## Side Quest: Naming Conventions
@@ -870,7 +879,7 @@ Let's build the simplest form that still makes sense for our blog, a "contact us
 
 ### The Page
 
-    yarn redwood generate page contact
+    yarn redwood g page contact
 
 We can put a link to Contact in our header:
 
