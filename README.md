@@ -413,7 +413,7 @@ Okay but what if we click "Delete"?
 
 ![image](https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png)
 
-So, Redwood just created a all the pages, components and services necissary to perform all CRUD actions on our posts table. No need to open a database GUI or login through a terminal window and write SQL froms scratch. Redwood calls these _sand caffolds_. Pretty neat, right?
+So, Redwood just created all the pages, components and services necessary to perform all CRUD actions on our posts table. No need to open a database GUI or login through a terminal window and write SQL froms scratch. Redwood calls these _scaffolds_. Pretty neat, right?
 
 Here's what happened when we ran that `yarn redwood g scaffold post` command:
 
