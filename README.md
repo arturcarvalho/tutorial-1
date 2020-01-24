@@ -442,7 +442,7 @@ Here's what happened when we ran that `yarn redwood g scaffold post` command:
 > - Services are always plural.
 > - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`)
 > - SDL filenames are plural.
-> - Pages are plural or singular depending on whether they deal deal with many or one post
+> - Pages are plural or singular depending on whether they deal with many or one post
 > - Layouts are singular
 > - Components, like pages, will be plural or singular depending on context.
 >
