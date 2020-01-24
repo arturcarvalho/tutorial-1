@@ -30,7 +30,7 @@ You'll have a new directory `redwoodblog` containing several directories and fil
 
 Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
 
-![image](https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png)
+<img src="https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png" width="500" />
 
 Now that we have the skeleton of our Redwood app in place, it's a good idea to save the current state of the app as your first commit...just in case.
 
@@ -42,7 +42,7 @@ Now that we have the skeleton of our Redwood app in place, it's a good idea to s
 
 Let's take a look at the files and directories that were created for us (config files have been excluded for now):
 
-<img src="https://user-images.githubusercontent.com/300/73015308-9e817e80-3dd0-11ea-8650-3d86eee1e2c1.png" alt="redwoodblog directory structure" style="width: 300px">
+<img src="https://user-images.githubusercontent.com/300/73015308-9e817e80-3dd0-11ea-8650-3d86eee1e2c1.png" alt="redwoodblog directory structure" width="300">
 
 At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. [Yarn refers to these as "workspaces"](https://yarnpkg.com/lang/en/docs/workspaces/). When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
 
@@ -95,7 +95,7 @@ This does two things:
 
 In fact this page is already live (your browser automatically reloaded):
 
-![image](https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png)
+<img src="https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png" width="500" />
 
 It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `web/src/Routes.js` and take a look at the route that was created:
 
@@ -198,7 +198,7 @@ One way to solve the `<header>` dilemma would be to create a `<Header>` componen
 
 When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes "before" (a `<header>`) or "after" (a `<footer>`). That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
 
-<img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" style="width: 300px">
+<img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" width="300">
 
 Let's create a layout to hold that `<header>`:
 
@@ -277,7 +277,7 @@ Back to the browser and you should see...nothing different. But that's good, it 
 >
 > If you're using the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) plugin this also helps disambiguate when browsing through your component stack:
 >
-> <img src="https://user-images.githubusercontent.com/300/73025189-f970a100-3de3-11ea-9285-15c1116eb59a.png" style="width:400px">
+> <img src="https://user-images.githubusercontent.com/300/73025189-f970a100-3de3-11ea-9285-15c1116eb59a.png" width="400">
 
 One more `<Link>`, let's have the title/logo link back to the homepage as per usual:
 
@@ -363,9 +363,16 @@ model Post {
   id        Int @id @default(autoincrement())
   title     String
   body      String
-  createdAt DateTime
+  createdAt DateTime @default(now())
 }
 ```
+
+This says that we want a table called `Post` and it should have:
+
+- An `id` column of type `Int`, we let Prisma know this is the column it should use as the `@id` (for it to create relationships to other tables) and that the `@default` value should be Prisma's special `autoincrement()` method letting it know that the DB should set it automatically when new records are created
+- A `title` field that will contain a `String`
+- A `body` field that will contain a `String`
+- A `createdAt` field that will be a `DateTime` and will `@default` to `now()` when we create a new record (so we don't have to set the time manually in our app)
 
 > For the tutorial we're keeping things simple and using an integer for our ID column. Some apps may want to use a GUID or a UUID which Prisma supports. In that case you would use `String` for the datatype instead of `Int` and use `guid()` or `uuid()` instead of `autoincrement()`.
 >
@@ -395,27 +402,27 @@ Let's generate everything we need to perform all the CRUD (Create, Retrieve, Upd
 
 Let's point the browser to `http://localhost:8910/posts` and see what we have:
 
-![image](https://user-images.githubusercontent.com/300/73027952-53c03080-3de9-11ea-8f5b-d62a3676bbef.png)
+<img src="https://user-images.githubusercontent.com/300/73027952-53c03080-3de9-11ea-8f5b-d62a3676bbef.png" width="500" />
 
 Well that's barely more than we got when we generated a page. What happens if we click that "New Post" button?
 
-![image](https://user-images.githubusercontent.com/300/73028004-72262c00-3de9-11ea-8924-66d1cc1fceb6.png)
+<img src="https://user-images.githubusercontent.com/300/73028004-72262c00-3de9-11ea-8924-66d1cc1fceb6.png" width="500" />
 
 Okay, now we're getting somewhere. Fill in the title and body and click "Save".
 
-![image](https://user-images.githubusercontent.com/300/73028757-08a71d00-3deb-11ea-8813-046c8479b439.png)
+<img src="https://user-images.githubusercontent.com/300/73028757-08a71d00-3deb-11ea-8813-046c8479b439.png" width="500" />
 
 Did we just create a post in the database? And then show that post here on this page? Yes, yes we did. Try creating another:
 
-![image](https://user-images.githubusercontent.com/300/73028839-312f1700-3deb-11ea-8e83-0012a3cf689d.png)
+<img src="https://user-images.githubusercontent.com/300/73028839-312f1700-3deb-11ea-8e83-0012a3cf689d.png" width="500" />
 
 But what if we click "Edit" on one of those posts?
 
-![image](https://user-images.githubusercontent.com/300/73031307-9802ff00-3df0-11ea-9dc1-ea9af8f21890.png)
+<img src="https://user-images.githubusercontent.com/300/73031307-9802ff00-3df0-11ea-9dc1-ea9af8f21890.png" width="500" />
 
 Okay but what if we click "Delete"?
 
-![image](https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png)
+<img src="https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png" width="500" />
 
 So, Redwood just created all the pages, components and services necessary to perform all CRUD actions on our posts table. No need to open a database GUI or login through a terminal window and write SQL froms scratch. Redwood calls these _scaffolds_. Pretty neat, right?
 
