@@ -28,7 +28,7 @@ You'll have a new directory `redwoodblog` containing several directories and fil
     yarn db:up
     yarn redwood dev
 
-Your browser should open to http://localhost:8910 and show the Redwood welcome page:
+Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
 
 ![image](https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png)
 
@@ -88,16 +88,16 @@ Let's give our users something to look at besides the Redwood welcome page. We'l
 
 This does two things:
 
-- Creates `/web/src/pages/HomePage/HomePage.js`. Redwood takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
-- Adds a `<Route>` in `/web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
+- Creates `web/src/pages/HomePage/HomePage.js`. Redwood takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
+- Adds a `<Route>` in `web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
 > If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Redwood automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up the routes file.
 
-In fact this page is already live. If you reload your browser you should see this new page instead of the Redwood welcome page:
+In fact this page is already live (your browser automatically reloaded):
 
 ![image](https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png)
 
-It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `/web/src/Routes.js` and take a look at the route that was created:
+It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `web/src/Routes.js` and take a look at the route that was created:
 
     <Route path="/" page={HomePage} name="home" />
 
@@ -105,7 +105,7 @@ Try changing the route to something like:
 
     <Route path="/hello" page={HomePage} name="home" />
 
-When the browser reloads, you'll see the `NotFoundPage` page. As soon as you add your first route, you'll never see the Redwood splash screen again. From now on, when no route can be found that matches the requested URL, Redwood will render the `NotFoundPage`. Change your URL to `http://localhost:8910/hello" and you should see our page again.
+Now you'll see the `NotFoundPage` page. As soon as you add your first route, you'll never see the Redwood splash screen again. From now on, when no route can be found that matches the requested URL, Redwood will render the `NotFoundPage`. Change your URL to `http://localhost:8910/hello" and you should see the homepage again.
 
 Change the route path back to `/` before continuing!
 
@@ -200,11 +200,13 @@ When you look at these two pages what do they really care about? They have some 
 
 <img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" style="width: 300px">
 
-Let's create a component to hold that `<header>`:
+Let's create a layout to hold that `<header>`:
 
-    yarn redwood generate layout blog
+    yarn redwood g layout blog
 
-That created `/web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
+> From now on we'll use the shorter `g` alias instead of `generate`
+
+That created `web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
 
 Cut the `<header>` from both `HomePage` and `AboutPage` and add it to the layout instead. Let's take out the duplicated `<main>` tag as well:
 
@@ -234,7 +236,7 @@ const BlogLayout = props => {
 export default BlogLayout;
 ```
 
-`props.children` is where the magic will happen. Any page content given to the layout will be rendered here. Back to `HomePage` and `AboutPage`, we add a `<BlogLayout>` wrapper and now they're back to focusing on the content they care about:
+`props.children` is where the magic will happen. Any page content given to the layout will be rendered here. Back to `HomePage` and `AboutPage`, we add a `<BlogLayout>` wrapper and now they're back to focusing on the content they care about (we can remove the import for `Link` and `routes` from `HomePage` since those are in the Layout instead):
 
 ```javascript
 // web/src/pages/HomePage/HomePage.js
@@ -275,7 +277,7 @@ Back to the browser and you should see...nothing different. But that's good, it 
 >
 > If you're using the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) plugin this also helps disambiguate when browsing through your component stack:
 >
-> <img src="https://user-images.githubusercontent.com/300/70564528-3854db00-1b45-11ea-9976-d6e5ddfb571f.png" style="width:400px">
+> <img src="https://user-images.githubusercontent.com/300/73025189-f970a100-3de3-11ea-9285-15c1116eb59a.png" style="width:400px">
 
 One more `<Link>`, let's have the title/logo link back to the homepage as per usual:
 
@@ -307,6 +309,27 @@ const BlogLayout = props => {
 export default BlogLayout;
 ```
 
+And then we can remove the extra "Return to Home" link (and Link/routes import) that we had on the About page:
+
+```javascript
+// web/src/pages/AboutPage/AboutPage.js
+
+import BlogLayout from "src/layouts/BlogLayout";
+
+const AboutPage = () => {
+  return (
+    <BlogLayout>
+      <p>
+        This site was created to demonstrate my mastery of Redwood: Look on my works, ye mighty, and
+        despair!
+      </p>
+    </BlogLayout>
+  );
+};
+
+export default AboutPage;
+```
+
 ## Getting Dynamic
 
 These two pages are great and all but where are the actual blog posts in this blog? Let's work on those next.
@@ -320,16 +343,27 @@ We need to decide what data we'll need for a blog post. We'll expand on this at 
 - `id` the unique identifier for this blog post (all of our database tables will have one of these)
 - `title`
 - `body` the actual content of the blog post
+- `createdAt` a timestamp of when this record was created
 
-We use [Prisma Photon](https://photonjs.prisma.io/) to talk to the database. Prisma has another library called Lift that lets us update the database's schema in a predictable way and snapshot each of those changes. Each change is called a _migration_ and Lift will create one when we make changes to our schema.
+We use [Prisma Client JS](https://photonjs.prisma.io/) to talk to the database. Prisma has another library called [Migrate](https://lift.prisma.io/) that lets us update the database's schema in a predictable way and snapshot each of those changes. Each change is called a _migration_ and Migrate will create one when we make changes to our schema.
 
-First let's define the data structure for a post in the database. Open up `/api/prisma/schema.prisma` and add the following:
+First let's define the data structure for a post in the database. Open up `api/prisma/schema.prisma` and add the definition of our Post table. The entire schema file should look like:
 
 ```javascript
+datasource DS {
+  provider = "sqlite"
+  url = "file:./dev.db"
+}
+
+generator photonjs {
+  provider = "photonjs"
+}
+
 model Post {
-  id    Int @id
-  title String
-  body  String
+  id        Int @id
+  title     String
+  body      String
+  createdAt DateTime
 }
 ```
 
@@ -339,60 +373,82 @@ That was simple. Now we'll want to snapshot this as a migration:
 
     yarn db:save
 
-When it asks what you want to name this migration its for your own benefit—neither Redwood nor Photon care about the migration's name. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory under `/api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Lift will use make the change to the database in `steps.json`).
+When it asks what you want to name this migration its for your own benefit—Redwood doesn't care about the migration's name, it's just a reference for future developers. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory created under `api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Prisma Migrate will use make the change to the database in `steps.json`).
 
 We apply the migration with another command:
 
     yarn db:up
 
-Since this is the first time this command has been run you'll be asked if you want to create the database (yes, you do). It will create a SQLite file at `/api/prisma/dev.db` and then apply the migration, creating a new table called `Post` with the fields we defined above.
+This will apply the migration (which runs the commands agains the database to create the changes we need) which results in creating a new table called `Post` with the fields we defined above.
 
-### Scaffolding a Post Editor
+### Creating a Post Editor
 
 We haven't decided on the look and feel of our site yet, but wouldn't it be amazing if we could play around with posts without having to build a bunch of pages that we'll probably throw away once the design team gets back to us? Lucky for us, "Amazing" is Redwood's middle name! It has no last name.
 
-Let's generate a _scaffold_ that will allow us to perform all the CRUD actions on posts so we can not only verify that we've got the right fields in the database, but let us get some sample posts in there so we can start laying out our pages and see real content. Redwood has a generator for just the occasion:
+Let's generate everything we need to perform all the CRUD (Create, Retrieve, Update, Delete) actions on posts so we can not only verify that we've got the right fields in the database, but let us get some sample posts in there so we can start laying out our pages and see real content. Redwood has a generator for just the occasion:
 
-    yarn redwood generate scaffold post
+    yarn redwood g scaffold post
 
 Let's point the browser to `http://localhost:8910/posts` and see what we have:
 
-[screenshot]
+![image](https://user-images.githubusercontent.com/300/73027952-53c03080-3de9-11ea-8f5b-d62a3676bbef.png)
 
 Well that's barely more than we got when we generated a page. What happens if we click that "New Post" button?
 
-[screenshot]
+![image](https://user-images.githubusercontent.com/300/73028004-72262c00-3de9-11ea-8924-66d1cc1fceb6.png)
 
-Okay, now we're getting somewhere. Fill in the title and body and click "Submit".
+Okay, now we're getting somewhere. Fill in the title and body and click "Save".
 
-[screenshot]
+![image](https://user-images.githubusercontent.com/300/73028757-08a71d00-3deb-11ea-8813-046c8479b439.png)
 
 Did we just create a post in the database? And then show that post here on this page? Yes, yes we did. Try creating another:
 
-[screenshot]
+![image](https://user-images.githubusercontent.com/300/73028839-312f1700-3deb-11ea-8e83-0012a3cf689d.png)
 
 But what if we click "Edit" on one of those posts?
 
-[Screenshot]
+![image](https://user-images.githubusercontent.com/300/73031307-9802ff00-3df0-11ea-9dc1-ea9af8f21890.png)
 
 Okay but what if we click "Delete"?
 
-[screenshot]
+![image](https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png)
 
-So, Redwood just created a complete scaffold for our posts table to allow us to perform all CRUD actions through these simple pages. No need to open a GUI or login through a terminal window and write SQL froms scratch. Pretty neat, right?
+So, Redwood just created a all the pages, components and services necissary to perform all CRUD actions on our posts table. No need to open a database GUI or login through a terminal window and write SQL froms scratch. Redwood calls these _sand caffolds_. Pretty neat, right?
 
-Here's what happened when we ran that `redwood generate scaffold post` command:
+Here's what happened when we ran that `yarn redwood g scaffold post` command:
 
-- Added an `sdl.js` file to define several GraphQL queries and mutations in `/api/src/graphql/posts.sdl.js`
-- Added a _services_ file in `/api/src/services/posts.js` that makes the Photon calls to get data in and out of the database
-- Created several pages in `/web/src/pages`:
-  - `PostsPage`
-  - `CreatePostPage`
-  - `EditPostPage`
-  - `ShowPostPage`
-- Created routes for those pages in `/web/src/Routes.js`
+- Added an _SDL_ file to define several GraphQL queries and mutations in `api/src/graphql/posts.sdl.js`
+- Added a _services_ file in `api/src/services/posts.js` that makes the Photon calls to get data in and out of the database
+- Created several _pages_ in `web/src/pages`:
+  - `EditPostsPage` for editing a post
+  - `NewPostPage` for creating a new post
+  - `PostPage` for showing the detail of a post
+  - `PostsPage` for listing all the posts
+- Created routes for those pages in `web/src/Routes.js`
+- Created three _cells_ in `web/src/components`:
+  - `EditPostCell` gets the post to edit in the database
+  - `PostCell` gets the post to display
+  - `PostsCell` gets all the posts
+- Created four _components_ also in `web/src/components`:
+  - `NewPost` displays the form for creating a new post
+  - `Post` displays a single post
+  - `PostForm` the actual form used by both the New and Edit components
+  - `Posts` displays the table of all posts
 
-Since we scaffolded "post" we got the pluralized name for our newly generated SDL, service, and pages (they do deal with multiple posts, not just one post!)
+> You'll notice that some of the generated parts have plural names and some have singular. This convention is borrowed from Ruby on Rails which uses a more "human" naming convention: if you're dealing with multiple of something (like the list of all posts) it will be plural. If you're only dealing with a single something (like creating a new post) it will be singular. It sounds natural when speaking, too: "show me a list of all the posts" versus "I'm going to create a new post."
+>
+> As far as the generators are concerned:
+>
+> - Services are always plural.
+> - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`)
+> - SDL filenames are plural.
+> - Pages are plural or singular depending on whether they deal deal with many or one post
+> - Layouts are singular
+> - Components, like pages, will be plural or singular depending on context.
+>
+> Also note that it's the database table name that singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
+>
+> You don't have to follow this convention once you start creating your own parts but we recommend doing so. The Ruby on Rails community has come to love this nomenclature even though many people complained about it when first exposed to it. [Give it five minutes](https://signalvnoise.com/posts/3124-give-it-five-minutes).
 
 ### Creating a Homepage
 
@@ -422,6 +478,7 @@ export const QUERY = gql`
       id
       title
       body
+      createdAt
     }
   }
 `;
