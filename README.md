@@ -971,6 +971,7 @@ For now we won't be talking to the database in our Contact form so we won't crea
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+import { RedwoodForm } from '@redwoodjs/web'
 
 const ContactPage = (props) => {
   return <RedwoodForm></RedwoodForm>
@@ -983,6 +984,7 @@ Well that was anticlimactic. You can't even see it in the browser. Let's add a f
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+import { RedwoodForm, TextField } from '@redwoodjs/web'
 
 const ContactPage = (props) => {
   return (
@@ -991,14 +993,18 @@ const ContactPage = (props) => {
     </RedwoodForm>
   )
 }
+
+export default ContactPage
 ```
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73228487-922c5700-412b-11ea-9a57-487754ebfbde.png" width="500" />
 
-Something it showing! Still, pretty boring. How about adding a submit button?
+Something is showing! Still, pretty boring. How about adding a submit button?
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+
+import { RedwoodForm, TextField, Submit } from '@redwoodjs/web'
 
 const ContactPage = (props) => {
   return (
@@ -1008,9 +1014,11 @@ const ContactPage = (props) => {
     </RedwoodForm>
   )
 }
+
+export default ContactPage
 ```
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73228537-c0119b80-412b-11ea-8a0d-1722f2c95ab4.png" width="500" />
 
 We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up but we have no indication that the form submitted or what happened to the data. Next we'll get the data in our fields.
 
@@ -1022,7 +1030,7 @@ Similar to a plain HTML form we'll give `<RedwoodForm>` an `onSubmit` handler. T
 // web/src/pages/ContactPage/ContactPage.js
 
 const ContactPage = (props) => {
-  const onSubmit = (data) {
+  const onSubmit = (data) => {
     console.log(data)
   }
 
@@ -1044,19 +1052,29 @@ Great! Let's turn this into a more useful form by adding a couple fields. We'll 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <TextField name="name" />
-    <TextField name="email" />
-    <TextArea name="message" />
-    <Submit>Save</Submit>
-  </RedwoodForm>
-)
+import { RedwoodForm, TextField, TextAreaField, Submit } from '@redwoodjs/web'
+
+const ContactPage = (props) => {
+  const onSubmit = (data) => {
+    console.log(data)
+  }
+
+  return (
+    <RedwoodForm>
+      <TextField name="name" />
+      <TextField name="email" />
+      <TextAreaField name="message" />
+      <Submit>Save</Submit>
+    </RedwoodForm>
+  )
+}
+
+export default ContactPage
 ```
 
-See the new `<TextArea>` component here which generates an HTML `<textarea>` but that contains Redwood's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
+See the new `<TextAreaField>` component here which generates an HTML `<textarea>` but that contains Redwood's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73229072-5abeaa00-412d-11ea-9b9c-47305e4e8094.png" width="500" />
 
 Let's add some labels and just a tiny bit of styling to at least separate the fields onto their own lines.
 
