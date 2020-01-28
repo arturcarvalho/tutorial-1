@@ -959,6 +959,20 @@ const BlogLayout = (props) => {
 export default BlogLayout
 ```
 
+And then use the `BlogLayout` in the `ContactPage`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+import BlogLayout from 'src/layouts/BlogLayout'
+
+const ContactPage = (props) => {
+  return <BlogLayout></BlogLayout>
+}
+
+export default ContactPage
+```
+
 Double check that everything looks good and then let's get to the good stuff.
 
 ### Introducing RedwoodForm
@@ -971,10 +985,16 @@ For now we won't be talking to the database in our Contact form so we won't crea
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+
 import { RedwoodForm } from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
-  return <RedwoodForm></RedwoodForm>
+  return (
+    <BlogLayout>
+      <RedwoodForm></RedwoodForm>
+    </BlogLayout>
+  )
 }
 
 export default ContactPage
@@ -985,19 +1005,22 @@ Well that was anticlimactic. You can't even see it in the browser. Let's add a f
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 import { RedwoodForm, TextField } from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   return (
-    <RedwoodForm>
-      <TextField name="input" />
-    </RedwoodForm>
+    <BlogLayout>
+      <RedwoodForm>
+        <TextField name="input" />
+      </RedwoodForm>
+    </BlogLayout>
   )
 }
 
 export default ContactPage
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73228487-922c5700-412b-11ea-9a57-487754ebfbde.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305498-108e0500-41cf-11ea-86a2-1075a3abaff0.png" width="500" />
 
 Something is showing! Still, pretty boring. How about adding a submit button?
 
@@ -1005,20 +1028,23 @@ Something is showing! Still, pretty boring. How about adding a submit button?
 // web/src/pages/ContactPage/ContactPage.js
 
 import { RedwoodForm, TextField, Submit } from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   return (
-    <RedwoodForm>
-      <TextField name="input" />
-      <Submit>Save</Submit>
-    </RedwoodForm>
+    <BlogLayout>
+      <RedwoodForm>
+        <TextField name="input" />
+        <Submit>Save</Submit>
+      </RedwoodForm>
+    </BlogLayout>
   )
 }
 
 export default ContactPage
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73228537-c0119b80-412b-11ea-8a0d-1722f2c95ab4.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305544-269bc580-41cf-11ea-821f-84f08bb9a5fb.png" width="500" />
 
 We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up but we have no indication that the form submitted or what happened to the data. Next we'll get the data in our fields.
 
@@ -1035,17 +1061,19 @@ const ContactPage = (props) => {
   }
 
   return (
-    <RedwoodForm onSubmit={onSubmit}>
-      <TextField name="input" />
-      <Submit>Save</Submit>
-    </RedwoodForm>
+    <BlogLayout>
+      <RedwoodForm onSubmit={onSubmit}>
+        <TextField name="input" />
+        <Submit>Save</Submit>
+      </RedwoodForm>
+    </BlogLayout>
   )
 }
 ```
 
 Now try filling in some data and submitting:
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73305602-4632ee00-41cf-11ea-815a-6079576c60bc.png" width="500" />
 
 Great! Let's turn this into a more useful form by adding a couple fields. We'll rename the existing one to "name" and add "email" and "message":
 
@@ -1053,6 +1081,7 @@ Great! Let's turn this into a more useful form by adding a couple fields. We'll 
 // web/src/pages/ContactPage/ContactPage.js
 
 import { RedwoodForm, TextField, TextAreaField, Submit } from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   const onSubmit = (data) => {
@@ -1060,12 +1089,14 @@ const ContactPage = (props) => {
   }
 
   return (
-    <RedwoodForm>
-      <TextField name="name" />
-      <TextField name="email" />
-      <TextAreaField name="message" />
-      <Submit>Save</Submit>
-    </RedwoodForm>
+    <BlogLayout>
+      <RedwoodForm>
+        <TextField name="name" />
+        <TextField name="email" />
+        <TextAreaField name="message" />
+        <Submit>Save</Submit>
+      </RedwoodForm>
+    </BlogLayout>
   )
 }
 
@@ -1074,7 +1105,7 @@ export default ContactPage
 
 See the new `<TextAreaField>` component here which generates an HTML `<textarea>` but that contains Redwood's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
 
-<img src="https://user-images.githubusercontent.com/300/73229072-5abeaa00-412d-11ea-9b9c-47305e4e8094.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305645-61056280-41cf-11ea-8be7-d1f4d55788c2.png" width="500" />
 
 Let's add some labels and just a tiny bit of styling to at least separate the fields onto their own lines.
 
@@ -1082,34 +1113,36 @@ Let's add some labels and just a tiny bit of styling to at least separate the fi
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField name="name" style={{ display: 'block' }} />
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit}>
+      <label for="name" style={{ display: 'block' }}>
+        Name
+      </label>
+      <TextField name="name" style={{ display: 'block' }} />
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField name="email" style={{ display: 'block' }} />
+      <label for="email" style={{ display: 'block' }}>
+        Email
+      </label>
+      <TextField name="email" style={{ display: 'block' }} />
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea name="message" style={{ display: 'block' }} />
+      <label for="message" style={{ display: 'block' }}>
+        Message
+      </label>
+      <TextAreaField name="message" style={{ display: 'block' }} />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
+      <Submit style={{ display: 'block' }}>Save</Submit>
+    </RedwoodForm>
+  </BlogLayout>
 )
 ```
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73305679-77abb980-41cf-11ea-95f7-8ea0e4bf2350.png" width="500" />
 
 That's a little better. Try filling out the form and submitting and you should get a console message with all three fields now.
 
 ### Validation
 
-"Okay Redwood tutorial author," you're saying, "what's the big deal? You built up Redwood's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! But anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assumption), what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Redwood, that's who!
+"Okay Redwood tutorial author," you're saying, "what's the big deal? You built up Redwood's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! Anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assumption), but what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Redwood, that's who!
 
 All three of these fields should be required in order for someone to send a message to us. Let's enforce that with the standard HTML `required` attribute:
 
@@ -1117,26 +1150,30 @@ All three of these fields should be required in order for someone to send a mess
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField name="name" style={{ display: 'block' }} required />
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit}>
+      <label for="name" style={{ display: 'block' }}>
+        Name
+      </label>
+      <TextField name="name" style={{ display: 'block' }} required />
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField name="email" style={{ display: 'block' }} required />
+      <label for="email" style={{ display: 'block' }}>
+        Email
+      </label>
+      <TextField name="email" style={{ display: 'block' }} required />
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea name="message" style={{ display: 'block' }} required />
+      <label for="message" style={{ display: 'block' }}>
+        Message
+      </label>
+      <TextAreaField name="message" style={{ display: 'block' }} required />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
+      <Submit style={{ display: 'block' }}>Save</Submit>
+    </RedwoodForm>
+  </BlogLayout>
 )
 ```
+
+<img src="https://user-images.githubusercontent.com/300/73305807-bf324580-41cf-11ea-94a8-f45a0506375d.png" width="500" />
 
 Now when trying to submit there'll be message from the browser noting that a field must be filled in. This is better than nothing, but these messages can't be styled. Can we do better?
 
@@ -1146,84 +1183,105 @@ Yes! Let's update that `required` call to instead be an object we pass to a cust
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField
-      name="name"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit}>
+      <label for="name" style={{ display: 'block' }}>
+        Name
+      </label>
+      <TextField
+        name="name"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField
-      name="email"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
+      <label for="email" style={{ display: 'block' }}>
+        Email
+      </label>
+      <TextField
+        name="email"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea
-      name="message"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
+      <label for="message" style={{ display: 'block' }}>
+        Message
+      </label>
+      <TextAreaField
+        name="message"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
+      <Submit style={{ display: 'block' }}>Save</Submit>
+    </RedwoodForm>
+  </BlogLayout>
 )
 ```
 
-And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want! Introducing `<FieldError>`:
+And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want! Introducing `<FieldError>` (don't forget to include it in the `import` statement at the top):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField
-      name="name"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="name" />
+import {
+  RedwoodForm,
+  TextField,
+  TextAreaField,
+  Submit,
+  FieldError,
+} from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField
-      name="email"
-      style={{ display: 'block ' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="email" />
+const ContactPage = (props) => {
+  const onSubmit = (data) => {
+    console.log(data)
+  }
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea
-      name="message"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="message" />
+  return (
+    <BlogLayout>
+      <RedwoodForm onSubmit={onSubmit}>
+        <label htmlFor="name" style={{ display: 'block' }}>
+          Name
+        </label>
+        <TextField
+          name="name"
+          style={{ display: 'block' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="name" />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
-)
+        <label htmlFor="email" style={{ display: 'block' }}>
+          Email
+        </label>
+        <TextField
+          name="email"
+          style={{ display: 'block ' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="email" />
+
+        <label htmlFor="message" style={{ display: 'block' }}>
+          Message
+        </label>
+        <TextAreaField
+          name="message"
+          style={{ display: 'block' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="message" />
+
+        <Submit style={{ display: 'block' }}>Save</Submit>
+      </RedwoodForm>
+    </BlogLayout>
+  )
+}
+
+export default ContactPage
 ```
 
 Note that the `name` attribute matches the `name` of the input field above it. That's so it knows which field to display errors for. Try submitting that form now.
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73305960-12a49380-41d0-11ea-977f-74078ad6ff04.png" width="500" />
 
 But this is just the beginning. Let's make sure folks realize this is an error message:
 
@@ -1231,43 +1289,45 @@ But this is just the beginning. Let's make sure folks realize this is an error m
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField
-      name="name"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="name" style={{ color: 'red' }} />
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit}>
+      <label for="name" style={{ display: 'block' }}>
+        Name
+      </label>
+      <TextField
+        name="name"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="name" style={{ color: 'red' }} />
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField
-      name="email"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="email" style={{ color: 'red' }} />
+      <label for="email" style={{ display: 'block' }}>
+        Email
+      </label>
+      <TextField
+        name="email"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="email" style={{ color: 'red' }} />
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea
-      name="message"
-      style={{ display: 'block' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="message" style={{ color: 'red' }} />
+      <label for="message" style={{ display: 'block' }}>
+        Message
+      </label>
+      <TextAreaField
+        name="message"
+        style={{ display: 'block' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="message" style={{ color: 'red' }} />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
+      <Submit style={{ display: 'block' }}>Save</Submit>
+    </RedwoodForm>
+  </BlogLayout>
 )
 ```
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73306040-3cf65100-41d0-11ea-99a9-9468bba82da7.png" width="500" />
 
 You know what would be nice, if the input itself somehow displayed the fact that there was an error:
 
@@ -1275,105 +1335,127 @@ You know what would be nice, if the input itself somehow displayed the fact that
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <label for="name" style={{ display: 'block' }}>
-      Name
-    </label>
-    <TextField
-      name="name"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="name" style={{ color: 'red' }} />
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit}>
+      <label for="name" style={{ display: 'block' }}>
+        Name
+      </label>
+      <TextField
+        name="name"
+        style={{ display: 'block' }}
+        errorStyle={{ display: 'block', borderColor: 'red' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="name" style={{ color: 'red' }} />
 
-    <label for="email" style={{ display: 'block' }}>
-      Email
-    </label>
-    <TextField
-      name="email"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="email" style={{ color: 'red' }} />
+      <label for="email" style={{ display: 'block' }}>
+        Email
+      </label>
+      <TextField
+        name="email"
+        style={{ display: 'block' }}
+        errorStyle={{ display: 'block', borderColor: 'red' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="email" style={{ color: 'red' }} />
 
-    <label for="message" style={{ display: 'block' }}>
-      Message
-    </label>
-    <TextArea
-      name="message"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="message" style={{ color: 'red' }} />
+      <label for="message" style={{ display: 'block' }}>
+        Message
+      </label>
+      <TextAreaField
+        name="message"
+        style={{ display: 'block' }}
+        errorStyle={{ display: 'block', borderColor: 'red' }}
+        validation={{ required: true }}
+      />
+      <FieldError name="message" style={{ color: 'red' }} />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
+      <Submit style={{ display: 'block' }}>Save</Submit>
+    </RedwoodForm>
+  </BlogLayout>
 )
 ```
 
-Oooo, what if the _label_ could change as well? It can, but we'll need Redwood's custom `<Label>` component for that (note that `for` becomes `name` just like the other components):
+<img src="https://user-images.githubusercontent.com/300/73306358-eb01fb00-41d0-11ea-8615-08e396c24cef.png" width="500" />
+
+Oooo, what if the _label_ could change as well? It can, but we'll need Redwood's custom `<Label>` component for that (note that `for` becomes `name` just like the other components). Don't forget the import:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-return (
-  <RedwoodForm onSubmit={onSubmit}>
-    <Label
-      name="name"
-      style={{ display: 'block' }}
-      errorStyle={{ color: 'red' }}
-    >
-      Name
-    </Label>
-    <TextField
-      name="name"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="name" style={{ color: 'red' }} />
+import {
+  RedwoodForm,
+  TextField,
+  TextAreaField,
+  Submit,
+  FieldError,
+  Label,
+} from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
-    <Label
-      name="name"
-      style={{ display: 'block' }}
-      errorStyle={{ color: 'red' }}
-    >
-      Email
-    </Label>
-    <TextField
-      name="email"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="email" style={{ color: 'red' }} />
+const ContactPage = (props) => {
+  const onSubmit = (data) => {
+    console.log(data)
+  }
 
-    <Label
-      name="name"
-      style={{ display: 'block' }}
-      errorStyle={{ color: 'red' }}
-    >
-      Message
-    </Label>
-    <TextArea
-      name="message"
-      style={{ display: 'block' }}
-      errorStyle={{ borderColor: 'red' }}
-      validation={{ required: true }}
-    />
-    <FieldError name="message" style={{ color: 'red' }} />
+  return (
+    <BlogLayout>
+      <RedwoodForm onSubmit={onSubmit}>
+        <Label
+          name="name"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', color: 'red' }}
+        />
+        <TextField
+          name="name"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', borderColor: 'red' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="name" style={{ color: 'red' }} />
 
-    <Submit style={{ display: 'block' }}>Save</Submit>
-  </RedwoodForm>
-)
+        <Label
+          name="email"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', color: 'red' }}
+        />
+        <TextField
+          name="email"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', borderColor: 'red' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="email" style={{ color: 'red' }} />
+
+        <Label
+          name="message"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', color: 'red' }}
+        >
+          Message
+        </Label>
+        <TextAreaField
+          name="message"
+          style={{ display: 'block' }}
+          errorStyle={{ display: 'block', borderColor: 'red' }}
+          validation={{ required: true }}
+        />
+        <FieldError name="message" style={{ color: 'red' }} />
+
+        <Submit style={{ display: 'block' }}>Save</Submit>
+      </RedwoodForm>
+    </BlogLayout>
+  )
+}
+
+export default ContactPage
 ```
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73306562-53e97300-41d1-11ea-8bdd-e149f6b439db.png" width="500" />
 
 > In addition to `style` and `errorStyle` you can also use `className` and `errorClassName`
+
+You might notice that the labels became lowercase. By default when you use `<Label>` as a self-closing tag (with no text content and closing `</Label>`) it will use the `name` attribute as the text label.
 
 We should make sure the email field actually contains an email:
 
@@ -1383,7 +1465,7 @@ We should make sure the email field actually contains an email:
 <TextField
   name="email"
   style={{ display: 'block' }}
-  errorStyle={{ borderColor: 'red' }}
+  errorStyle={{ display: 'block', borderColor: 'red' }}
   validation={{
     required: true,
     pattern: {
@@ -1412,7 +1494,9 @@ That is definitely not the end-all-be-all for email address validation, but pret
 />
 ```
 
-You probably noticed that trying to submit a form with validation errors should output nothing to the console—it's not actually submitting. Fix the errors and all is well.
+<img src="https://user-images.githubusercontent.com/300/73306774-be9aae80-41d1-11ea-8f72-ac783ec44e76.png" width="500" />
+
+You may have noticed that trying to submit a form with validation errors outputs nothing to the console—it's not actually submitting. Fix the errors and all is well.
 
 Finally, you know what would _really_ be nice: if the fields were validated as soon as the user leaves each one so they don't fill out the whole thing and submit just to see multiple errors appear. Let's do that:
 
