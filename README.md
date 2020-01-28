@@ -924,12 +924,14 @@ Let's build the simplest form that still makes sense for our blog, a "contact us
 
 ### The Page
 
-    yarn redwood g page contact
+    yarn rw g page contact
 
-We can put a link to Contact in our header:
+We can put a link to Contact in our layout's header:
 
 ```javascript
 // web/src/layouts/BlogLayout/BlogLayout.js
+
+import { Link, routes } from '@redwoodjs/router'
 
 const BlogLayout = (props) => {
   return (
@@ -953,13 +955,15 @@ const BlogLayout = (props) => {
     </>
   )
 }
+
+export default BlogLayout
 ```
 
 Double check that everything looks good and then let's get to the good stuff.
 
 ### Introducing RedwoodForm
 
-Forms in React are infamously annoying to work with. There are [Controlled Components](https://reactjs.org/docs/forms.html#controlled-components) and [Uncontrolled Components](https://reactjs.org/docs/uncontrolled-components.html) and [third party libraries](https://jaredpalmer.com/formik/) and many more workarounds to try and make forms in React as simple as they were originally intended to be: an `<input>` field with a `name` attribute that gets submitted somewhere when you click a `<button>`.
+Forms in React are infamously annoying to work with. There are [Controlled Components](https://reactjs.org/docs/forms.html#controlled-components) and [Uncontrolled Components](https://reactjs.org/docs/uncontrolled-components.html) and [third party libraries](https://jaredpalmer.com/formik/) and many more workarounds to try and make forms in React as simple as they were originally intended to be: an `<input>` field with a `name` attribute that gets submitted somewhere when you click a button.
 
 We think Redwood is a step or two in the right direction by not only freeing you from writing controlled component plumbing, but also dealing with validation and errors automatically. Let's see how it works.
 
