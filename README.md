@@ -1516,21 +1516,19 @@ Having a contact form is great, but only if you actually get the contact somehow
 
 ## Saving Data
 
-Let's add a new database table. Open up `schema.prisma` and add a Contact table:
+Let's add a new database table. Open up `api/prisma/schema.prisma` and add a Contact table:
 
 ```javascript
 // api/prisma/schema.prisma
 
 model Contact {
-  id Int @id
-  name String
-  email String
-  message String
+  id        Int @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
   createdAt DateTime @default(now())
 }
 ```
-
-We've added a `createdAt` table that isn't referenced in the UI at all, but it will default to a timestamp of whenever the record is created so we know when someone filled out the form. By default each column will be required by the database.
 
 > To mark a column as optional (that is, allowing `NULL` as a value) you can suffix the datatype with question mark: `name String?`
 
@@ -1542,13 +1540,13 @@ The command will ask for a name again. How about "create contact"? Finally we ex
 
     yarn rw db:up
 
-Now we'll great the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
+Now we'll create the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
-    yarn redwood generate sdl contact
+    yarn rw g sdl contact
 
 Just like the `scaffold` command, this will create two new files under the `api` directory:
 
-1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language (thus the `.sdl` in the filename)
+1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language
 2. `api/src/services/contacts.js`: contains your app's business logic.
 
 Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containting each database field in the table:
@@ -1577,6 +1575,8 @@ What's `ContactInput`? Redwood follows the Apollo recommendation of using [Input
 
 Since all of the DB columns were required in the schema.prisma file they are marked as required here (the `!` suffix on the datatype).
 
+> Remember: schema.prisma requires an extra `?` character when a field is _not_ required, Apollo requires an extra `!` when a field _is_ required.
+
 As described in [Side Quest: How Redwood Deals with Data](#) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
 
 In this case we're creating a single `Mutation` that we'll call `createContact`. Add that to the end of the SDL file:
@@ -1591,52 +1591,59 @@ type Mutation {
 
 The `createContact` mutation will accept a single variable, `input`, that is an object that conforms to what we expect for a `ContactInput`, namely `{ name, email, message }`.
 
-That's it for the SDL file, let's define the service that will actually save the data to the database:
+That's it for the SDL file, let's define the service that will actually save the data to the database. The service includes a default `contacts` function for getting all contacts from the database. Let's add our mutation to create a new contact:
 
 ```javascript
 // api/src/services/contacts.js
+
 const Contacts = {
+  contacts: () => {
+    return photon.contacts.findMany()
+  },
+
   createContact: ({ input }) => {
     return photon.contacts.create({ data: input })
-  }
+  },
+}
+
+export default Contacts
 ```
 
 Thanks to Photon it takes very little code to actually save something to the database! This is an asynchronous call but we didn't have to worry about resolving Promises or dealing with `async/await`. Apollo will do that for us!
 
-Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `redwood dev`.
+Before we plug this into the UI, let's take a look at a nifty GUI you get just by running `yarn redwood dev`.
 
 ### GraphQL Playground
 
 Often it's nice to experiment and call your API in a more "raw" form before you get too far down the path of implementation only to find out something is missing. Is there a typo in the API layer or the web layer? Let's find out by accessing just the API layer.
 
-When you started development with `redwood dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
+When you started development with `yarn redwood dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
 
-![image](https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png)
+<img src="https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png" width="500" />
 
 Not very exciting yet, but check out that "Docs" tab on the far right:
 
-![image](https://user-images.githubusercontent.com/300/70951080-490ac280-2017-11ea-88f7-7d262cdfa104.png)
+<img src="https://user-images.githubusercontent.com/300/73311311-fce89b80-41da-11ea-9a7f-2ef6b8191052.png" width="500" />
 
 It's the complete schema as defined by our SDL files! The Playground will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
 
-![image](https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png)
+<img src="https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png" width="500" />
 
 We should also be able to create a new contact:
 
-![image](https://user-images.githubusercontent.com/300/70951633-c125b800-2018-11ea-9b65-e4772ef2dfd9.png)
-[screenshot not final]
+<img src="https://user-images.githubusercontent.com/300/73311826-471e4c80-41dc-11ea-9476-a9ef8cdfce20.png" width="500" />
 
 The GraphQL Playground is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
 
 ### Creating a Contact
 
-Our GraphQL mutation is ready to go on the backend so all that's left is to invoke it on the frontend. Everything related to our form is in `ContactPage` so that's the logical place to put the mutation call. First we define the mutation as a constant that we call later:
+Our GraphQL mutation is ready to go on the backend so all that's left is to invoke it on the frontend. Everything related to our form is in `ContactPage` so that's the logical place to put the mutation call. First we define the mutation as a constant that we call later (this can be defined outside of the component itself, right after the `import` statements):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 const CREATE_CONTACT = gql`
-  mutation {
+  mutation CreateContactMutation($input: ContactInput!) {
     createContact(input: $input) {
       id
     }
@@ -1646,10 +1653,21 @@ const CREATE_CONTACT = gql`
 
 We reference the `createContact` mutation we defined in the Contacts SDL passing it an `input` object which will contain the actual name, email and message fields.
 
-Next we'll call the `useMutation` hook provided by Apollo which will allow us to execute the mutation when we're ready and also capture the loading and error states once the call is made:
+Next we'll call the `useMutation` hook provided by Apollo which will allow us to execute the mutation when we're ready and also capture the loading and error states once the call is made (don't forget the `import` statement):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+
+import {
+  RedwoodForm,
+  TextField,
+  TextAreaField,
+  Submit,
+  FieldError,
+  Label,
+} from '@redwoodjs/web'
+import { useMutation } from '@redwoodjs/web'
+import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   const [create] = useMutation(CREATE_CONTACT)
@@ -1686,7 +1704,7 @@ Now we can update the `onSubmit` function to invoke the mutation with the data i
 const ContactPage = (props) => {
   const [create] = useMutation(CREATE_CONTACT)
 
-  const onSubmit = (data) {
+  const onSubmit = (data) => {
     create({ variables: { input: data }})
   }
 
