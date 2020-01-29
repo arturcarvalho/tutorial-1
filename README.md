@@ -1756,7 +1756,9 @@ return (
 
 It may be hard to see a difference in development because the submit is so fast, but you could enable network throttling via the Network tab Chrome's Web Inspector to simulate a slow connection:
 
-![image](https://user-images.githubusercontent.com/300/71037869-6dc56f80-20d5-11ea-8b26-3dadb8a1ed86.png)
+<img src="https://user-images.githubusercontent.com/300/71037869-6dc56f80-20d5-11ea-8b26-3dadb8a1ed86.png" width="500" />
+
+You'll see that the "Save" button become disabled for a second or two while waiting for the response.
 
 Next let's let the user know their submission was successful. `useMutation` can accept a second argument containing an options object. One of those options is a callback function that will be invoked when the mutation successfully completes called `onCompleted`. We'll use that callback to notify the user via a simple alert box:
 
@@ -1770,49 +1772,112 @@ const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
 })
 ```
 
-Finally, let's let the user know if a server error occurs. We already capture any existing error in the `error` constant that we got from `useMutation`, so we _could_ maually display an error box on the page somewhere containing those errors, maybe at the top of the form:
+Finally, let's let the user know if a server error occurs. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place RedwoodForm can't know about those, but we still need to let the user know something went wrong.
+
+We have email validation on the client, but any good developer knows _never trust the client_. Let's add the email validation on the API as well to be sure no bad data gets into our database, even if someone somehow bypassed our client-side validation.
+
+We talked about business logic belonging in our services files and this is a perfect example. Let's add a `validate` function to our `Contacts` service:
+
+```javascript
+// api/src/services/contacts.js
+
+import { UserInputError } from '@redwoodjs/api'
+
+const validate = (input) => {
+  if (input.email && !input.email.match(/[^@]+@[^\.]+\..+/)) {
+    throw new UserInputError("Can't create new contact", {
+      messages: {
+        email: ['is not formatted like an email address'],
+      },
+    })
+  }
+}
+
+const Contacts = {
+  contacts: () => {
+    return photon.contacts.findMany()
+  },
+
+  createContact: ({ input }) => {
+    validate(input)
+    return photon.contacts.create({ data: input })
+  },
+}
+
+export default Contacts
+```
+
+So when `createContact` is called it will first validate the inputs and only if no errors are thrown will it continue to actually create the record in the database.
+
+We already capture any existing error in the `error` constant that we got from `useMutation`, so we _could_ manually display an error box on the page somewhere containing those errors, maybe at the top of the form:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 <RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
   { error && (
-    <div style={{ color: 'red' }}>We couldn't send your message: {error}</div>
+    <div style={{ color: 'red' }}>We couldn't send your message: {error.message}</div>
   )}
   // ...
 ```
 
-To get a server error to fire, let's remove the validation on one of the fields in the form, like `name`. Remember that `name` is required in the database and GraphQL schema, so if we don't submit one we should get an error from GraphQL. Update the `<TextField>` for `name`:
+To get a server error to fire, let's remove the email format validatation so that the client-side error is shown:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 <TextField
-  name="name"
+  name="email"
   style={{ display: 'block' }}
-  errorStyle={{ borderColor: 'red' }}
+  errorStyle={{ display: 'block', borderColor: 'red' }}
+  validation={{
+    required: true,
+  }}
 />
 ```
 
-If you submit the form without a `name` you should see an error appear at the top of the form:
+Now try filling out the form with an invalid email address:
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73316723-b601a280-41e8-11ea-8ed1-e3799821caa1.png" width="500" />
 
-It ain't pretty, but it works. Seeing a backtrace in our error is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
+It ain't pretty, but it works. Seeing a "GraphQL error" is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
 
 Remember when we said that `<RedwoodForm>` had one more trick up its sleeve? Here it comes!
 
-Remove the inline error display we just added (`{ error && ...`) and try passing the `error` constant to `<RedwoodForm>`:
+Remove the inline error display we just added (`{ error && ...`) and replace it with `<RedwoodFormError>`, passing the `error` constant we got from `useMutation` and a little bit of styling to `wrapperStyle` (don't forget the `import`). We'll also pass `error` to `<RedwoodForm>` so it can setup a context:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
+import {
+  RedwoodForm,
+  TextField,
+  TextAreaField,
+  Submit,
+  FieldError,
+  Label,
+  RedwoodFormError,
+} from '@redwoodjs/web'
+
+// ...
+
+return (
+  <BlogLayout>
+    <RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
+      <RedwoodFormError error={error} wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }} />
+    //...
 ```
 
 Now submit a message without a name:
 
-[screenshot]
+<img src="https://user-images.githubusercontent.com/300/73317487-1b569300-41eb-11ea-9fae-a9a7ae3c52f1.png" width="500" />
+
+> `<RedwoodFormError>` has several styling options which are attached to different parts of the message:
+>
+> - `wrapperStyle` / `wrapperClassName`: the container for the entire message
+> - `titleStyle` / `titleClassName`: the "Can't create new contact" title
+> - `listStyle` / `listClassName`: the `<ul>` that contains the list of errors
+> - `listItemStyle` / `listItemClassName`: each individual `<li>` around each error
 
 We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long. The user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
 
@@ -1825,15 +1890,21 @@ Having the admin screens at `/admin` is a reasonable thing to do. Let's update t
 ```javascript
 // web/src/Routes.js
 
-<Route path="/admin/posts" page="{PostsPage}" name="posts" />
-<Route path="/admin/posts/{id}" page="{PostPage}" name="post" />
+<Route path="/admin/posts/{id:Int}/edit" page="{EditPostPage}" name="editPost" />
 <Route path="/admin/posts/new" page="{NewPostsPage}" name="newPost" />
-<Route path="/admin/posts/{id}/edit" page="{EditPostPage}" name="editPost" />
+<Route path="/admin/posts/{id:Int}" page="{PostPage}" name="post" />
+<Route path="/admin/posts" page="{PostsPage}" name="posts" />
 ```
 
-Thanks to named routes we don't have to update any of the `<Link>`s that were generated by the scaffolds since the names of the pages didn't change.
+Thanks to named routes we don't have to update any of the `<Link>`s that were generated by the scaffolds since the `name`s of the pages didn't change!
 
-Next let's making sure only we are accessing these pages.
+How about getting this thing out into the real world?
+
+## Deployment
+
+- Branch deploys
+- Netlify forms
+- Custom functions
 
 ### Authentication
 
@@ -1896,12 +1967,6 @@ There are a few things we need to do to get ready for an authenticated user:
 - Keep track of details for the logged in user (maybe show a "Welcome, [Name]" in the corner)
 
 The first is figure out a place to put our authentication code so that it blocks access to all of our admin screens.
-
-## Deployment
-
-- Branch deploys
-- Netlify forms
-- Custom functions
 
 # Cookbook Stuff
 
