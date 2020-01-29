@@ -502,7 +502,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>No posts yet!</div>
 
-export const Error = ({ error }) => (
+export const Failure = ({ error }) => (
   <div>Error loading posts: {error.message}</div>
 )
 
@@ -520,13 +520,13 @@ When React renders this component Redwood will:
 
 - Perform the `QUERY` and display the `Loader` component until a response is received
 - Once the query returns it will display one of three states:
-  - If there was an error, the `Error` component
+  - If there was an error, the `Failure` component
   - If the data return is empty (null or empty array), the `Empty` component
   - Otherwise, the `Success` component
 
 There are also some lifecycle helpers like `beforeQuery` (for massaging any props before being given to the `Query`) and `afterQuery` (for massaging the data returned from GraphQL but before being sent to the `Success` component)
 
-The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. If you don't provide an `Error` component you'll get error output sent to the console.
+The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. If you don't provide an `Failure` component you'll get error output sent to the console.
 
 A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding. Let Redwood worry about juggling what is displayed when and you can focus on the happy path of the final, rendered component populated with data.
 
@@ -553,7 +553,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ blogPosts }) => {
   return JSON.stringify(blogPosts)
@@ -586,7 +586,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ posts }) => {
   return JSON.stringify(posts)
@@ -707,7 +707,7 @@ Now let's link the title of the post on the homepage to the detail page (and inc
 // web/src/components/BlogPostsCell/BlogPostsCell.js
 import { Link, routes } from '@redwoodjs/router'
 
-// Loading, Empty and Error definitions...
+// Loading, Empty and Failure definitions...
 
 export const Success = ({ posts }) => {
   return posts.map((post) => (
@@ -787,7 +787,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ post }) => {
   return JSON.stringify(post)
