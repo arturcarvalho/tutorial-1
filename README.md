@@ -25,7 +25,6 @@ We'll use yarn ([yarn](https://yarnpkg.com/en/docs/install) is a requirement) to
 You'll have a new directory `redwoodblog` containing several directories and files. Change to that directory and let's create the database, and then start the development server:
 
     cd redwoodblog
-    yarn redwood db:up
     yarn redwood dev
 
 Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
@@ -384,7 +383,7 @@ This says that we want a table called `Post` and it should have:
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    yarn redwood db:save
+    yarn redwood db save
 
 When it asks what you want to name this migration its for your own benefit—Redwood doesn't care about the migration's name, it's just a reference for future developers. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory created under `api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Prisma Migrate will use make the change to the database in `steps.json`).
 
