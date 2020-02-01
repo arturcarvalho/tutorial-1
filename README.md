@@ -736,7 +736,7 @@ Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever va
 Cool, cool, cool. Now we need to construct a link that has the ID of a post in it:
 
 ```javascript
-// web/src/pages/HomePage/HomePage.js
+// web/src/pages/BlogPostsCell/BlogPostsCell.js
 
 <Link to={routes.blogPost({ id: post.id })}>{post.title}</Link>
 ```
@@ -809,7 +809,7 @@ const BlogPostPage = ({ id }) => {
 
 `id` already exists since we named our route param `{id}`. Thanks Redwood! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Redwood by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
-We can prove it! Trying going to the detail page for a post in the browser and—uh oh. Hmm:
+We can prove it! Try going to the detail page for a post in the browser and—uh oh. Hmm:
 
 <img src="https://user-images.githubusercontent.com/300/73212685-96dd1500-4103-11ea-9108-4162470aeb6d.png" width="500" />
 
@@ -883,7 +883,7 @@ const BlogPost = ({ post }) => {
 export default BlogPost
 ```
 
-And update `BlogPostsCell` and `BlogPostCell` to use this new component instead (don't forget the `import BlogPost from 'src/components/BlogPost` at the top of each):
+And update `BlogPostsCell` and `BlogPostCell` to use this new component instead (don't forget the `import BlogPost from 'src/components/BlogPost'` at the top of each):
 
 ```javascript
 // web/src/components/BlogPostsCell/BlogPostsCell.js
@@ -1533,11 +1533,11 @@ model Contact {
 
 Next we create a migration file:
 
-    yarn rw db:save
+    yarn rw db save
 
 The command will ask for a name again. How about "create contact"? Finally we execute the migration to run the DDL commands to upgrade the database:
 
-    yarn rw db:up
+    yarn rw db up
 
 Now we'll create the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
@@ -1545,10 +1545,10 @@ Now we'll create the GraphQL interface to access this table. We haven't used thi
 
 Just like the `scaffold` command, this will create two new files under the `api` directory:
 
-1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language
+1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in GraphQL's schema definition language
 2. `api/src/services/contacts.js`: contains your app's business logic.
 
-Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containting each database field in the table:
+Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containing each database field in the table:
 
 ```javascript
 // api/src/graphql/contacts.sdl.js
@@ -1568,13 +1568,13 @@ type ContactInput {
 }
 ```
 
-What's `ContactInput`? Redwood follows the Apollo recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
+What's `ContactInput`? Redwood follows the GraphQL recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
 
 > Redwood assumes your code won't try to set a value on any field named `id` or `createdAt` so it left those out of the `ContactInput` type, but if your database allowed either of those to be set manually you can update `ContactInput` and add them.
 
-Since all of the DB columns were required in the schema.prisma file they are marked as required here (the `!` suffix on the datatype).
+Since all of the DB columns were required in the `schema.prisma` file they are marked as required here (the `!` suffix on the datatype).
 
-> Remember: schema.prisma requires an extra `?` character when a field is _not_ required, Apollo requires an extra `!` when a field _is_ required.
+> Remember: `schema.prisma` requires an extra `?` character when a field is _not_ required, GraphQL's SDL requires an extra `!` when a field _is_ required.
 
 As described in [Side Quest: How Redwood Deals with Data](#) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
 
