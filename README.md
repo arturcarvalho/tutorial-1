@@ -1880,6 +1880,63 @@ Now submit a message without a name:
 
 We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long. The user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
 
+### One more thing...
+
+Since we're not redirecting after the form submits we should at least clear out the form fields. This requires we get access to a `reset()` function that's part of `react-hook-form` but we don't have access to it when using the simplest usage of `<RedwoodForm>` (like we're currently using).
+
+`react-hook-form` has a hook called `useForm()` which is normally called for us within `RedwoodForm`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `RedwoodForm`. Here's how we do that.
+
+First we'll import `useForm`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+import { useForm } from 'react-hook-form'
+```
+
+And now call it inside of our component:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const formMethods = useForm()
+  //...
+```
+
+Now we'll tell `<RedwoodForm>` to use the `formMethods` we just instantiated instead of doing it itself:
+
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <BlogLayout>
+    <RedwoodForm
+      formMethods={formMethods}
+      onSubmit={onSubmit}
+      validation={{ mode: 'onBlur' }}
+      error={error}
+    >
+    // ...
+```
+
+Now we can call `reset()` on `formMethods` after the alert box is shown:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
+    onCompleted: () => {
+      alert('Thank you for your submission!')
+      formMethods.reset()
+    },
+  })
+```
+
+That's it! (React Hook Form)[https://react-hook-form.com/] provides a bunch of (functionality)[https://react-hook-form.com/api] that even `<RedwoodForm>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<RedwoodForm>` so that it keeps working!
+
 The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
 ## Administration
