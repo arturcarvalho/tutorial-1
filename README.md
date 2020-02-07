@@ -1906,7 +1906,6 @@ const ContactPage = (props) => {
 
 Now we'll tell `<RedwoodForm>` to use the `formMethods` we just instantiated instead of doing it itself:
 
-
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
@@ -1994,7 +1993,7 @@ You'll be returned to your app's detail page. You should be on the "Resources" t
 
 <img width="500" alt="Screen Shot 2020-02-03 at 3 24 43 PM" src="https://user-images.githubusercontent.com/300/73703951-6ae30600-46a6-11ea-8d9b-a900b7af2ac5.png">
 
-Click the "Heroku Postgres" link to get to the detail page. We did all the steps above so that we could copy the URI listed at the bottom:
+Click the "Heroku Postgres" link to get to the detail page, then the "Settings" tab and finally the "View Credentials..." button. We did all the steps above so that we could copy the URI listed at the bottom:
 
 <img width="500" alt="Screen Shot 2020-02-03 at 3 25 31 PM" src="https://user-images.githubusercontent.com/300/73703956-70405080-46a6-11ea-81f2-bed99ca4c4cc.png">
 
