@@ -501,7 +501,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>No posts yet!</div>
 
-export const Error = ({ error }) => (
+export const Failure = ({ error }) => (
   <div>Error loading posts: {error.message}</div>
 )
 
@@ -519,13 +519,13 @@ When React renders this component Redwood will:
 
 - Perform the `QUERY` and display the `Loader` component until a response is received
 - Once the query returns it will display one of three states:
-  - If there was an error, the `Error` component
+  - If there was an error, the `Failure` component
   - If the data return is empty (null or empty array), the `Empty` component
   - Otherwise, the `Success` component
 
 There are also some lifecycle helpers like `beforeQuery` (for massaging any props before being given to the `Query`) and `afterQuery` (for massaging the data returned from GraphQL but before being sent to the `Success` component)
 
-The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. If you don't provide an `Error` component you'll get error output sent to the console.
+The minimum you need for a cell are the `QUERY` and `Success` exports. If you don't export an `Empty` component, empty results will be sent to your `Success` component. If you don't provide an `Failure` component you'll get error output sent to the console.
 
 A guideline for when to use cells is if your component needs some data from the database or other service that may be delayed in responding. Let Redwood worry about juggling what is displayed when and you can focus on the happy path of the final, rendered component populated with data.
 
@@ -552,7 +552,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ blogPosts }) => {
   return JSON.stringify(blogPosts)
@@ -585,7 +585,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ posts }) => {
   return JSON.stringify(posts)
@@ -706,7 +706,7 @@ Now let's link the title of the post on the homepage to the detail page (and inc
 // web/src/components/BlogPostsCell/BlogPostsCell.js
 import { Link, routes } from '@redwoodjs/router'
 
-// Loading, Empty and Error definitions...
+// Loading, Empty and Failure definitions...
 
 export const Success = ({ posts }) => {
   return posts.map((post) => (
@@ -736,7 +736,7 @@ Notice the `{id}`. Redwood calls these _route parameters_. They say "whatever va
 Cool, cool, cool. Now we need to construct a link that has the ID of a post in it:
 
 ```javascript
-// web/src/pages/HomePage/HomePage.js
+// web/src/pages/BlogPostsCell/BlogPostsCell.js
 
 <Link to={routes.blogPost({ id: post.id })}>{post.title}</Link>
 ```
@@ -786,7 +786,7 @@ export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
 
-export const Error = ({ error }) => <div>Error: {error.message}</div>
+export const Failure = ({ error }) => <div>Error: {error.message}</div>
 
 export const Success = ({ post }) => {
   return JSON.stringify(post)
@@ -809,7 +809,7 @@ const BlogPostPage = ({ id }) => {
 
 `id` already exists since we named our route param `{id}`. Thanks Redwood! But how does that `id` end up as the `$id` GraphQL parameter? If you've learned anything about Redwood by now, you should know it's going to take care of that for you! By default, any props you give to a cell will automatically be turned into variables and given to the query. "Say what!" you're saying. It's true!
 
-We can prove it! Trying going to the detail page for a post in the browser and—uh oh. Hmm:
+We can prove it! Try going to the detail page for a post in the browser and—uh oh. Hmm:
 
 <img src="https://user-images.githubusercontent.com/300/73212685-96dd1500-4103-11ea-9108-4162470aeb6d.png" width="500" />
 
@@ -883,7 +883,7 @@ const BlogPost = ({ post }) => {
 export default BlogPost
 ```
 
-And update `BlogPostsCell` and `BlogPostCell` to use this new component instead (don't forget the `import BlogPost from 'src/components/BlogPost` at the top of each):
+And update `BlogPostsCell` and `BlogPostCell` to use this new component instead (don't forget the `import BlogPost from 'src/components/BlogPost'` at the top of each):
 
 ```javascript
 // web/src/components/BlogPostsCell/BlogPostsCell.js
@@ -1545,10 +1545,10 @@ Now we'll create the GraphQL interface to access this table. We haven't used thi
 
 Just like the `scaffold` command, this will create two new files under the `api` directory:
 
-1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in Apollo's schema definition language
+1. `api/src/graphql/contacts.sdl.js`: defines the GraphQL schema in GraphQL's schema definition language
 2. `api/src/services/contacts.js`: contains your app's business logic.
 
-Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containting each database field in the table:
+Open up `api/src/graphql/contact.sdl.js` and you'll see the `Contact` and `ContactInput` types were already defined for us—the `generate sdl` command introspected the database and created a type containing each database field in the table:
 
 ```javascript
 // api/src/graphql/contacts.sdl.js
@@ -1568,13 +1568,13 @@ type ContactInput {
 }
 ```
 
-What's `ContactInput`? Redwood follows the Apollo recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
+What's `ContactInput`? Redwood follows the GraphQL recommendation of using [Input Types](https://graphql.org/graphql-js/mutations-and-input-types/) in mutations rather than listing out each and every field that can be set.
 
 > Redwood assumes your code won't try to set a value on any field named `id` or `createdAt` so it left those out of the `ContactInput` type, but if your database allowed either of those to be set manually you can update `ContactInput` and add them.
 
-Since all of the DB columns were required in the schema.prisma file they are marked as required here (the `!` suffix on the datatype).
+Since all of the DB columns were required in the `schema.prisma` file they are marked as required here (the `!` suffix on the datatype).
 
-> Remember: schema.prisma requires an extra `?` character when a field is _not_ required, Apollo requires an extra `!` when a field _is_ required.
+> Remember: `schema.prisma` requires an extra `?` character when a field is _not_ required, GraphQL's SDL requires an extra `!` when a field _is_ required.
 
 As described in [Side Quest: How Redwood Deals with Data](#) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
 
@@ -1880,6 +1880,62 @@ Now submit a message without a name:
 
 We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long. The user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
 
+### One more thing...
+
+Since we're not redirecting after the form submits we should at least clear out the form fields. This requires we get access to a `reset()` function that's part of `react-hook-form` but we don't have access to it when using the simplest usage of `<RedwoodForm>` (like we're currently using).
+
+`react-hook-form` has a hook called `useForm()` which is normally called for us within `RedwoodForm`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `RedwoodForm`. Here's how we do that.
+
+First we'll import `useForm`:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+import { useForm } from 'react-hook-form'
+```
+
+And now call it inside of our component:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+const ContactPage = (props) => {
+  const formMethods = useForm()
+  //...
+```
+
+Now we'll tell `<RedwoodForm>` to use the `formMethods` we just instantiated instead of doing it itself:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  <BlogLayout>
+    <RedwoodForm
+      formMethods={formMethods}
+      onSubmit={onSubmit}
+      validation={{ mode: 'onBlur' }}
+      error={error}
+    >
+    // ...
+```
+
+Now we can call `reset()` on `formMethods` after the alert box is shown:
+
+```javascript
+// web/src/pages/ContactPage/ContactPage.js
+
+return (
+  const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
+    onCompleted: () => {
+      alert('Thank you for your submission!')
+      formMethods.reset()
+    },
+  })
+```
+
+That's it! (React Hook Form)[https://react-hook-form.com/] provides a bunch of (functionality)[https://react-hook-form.com/api] that even `<RedwoodForm>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<RedwoodForm>` so that it keeps working!
+
 The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
 ## Administration
@@ -1901,11 +1957,86 @@ How about getting this thing out into the real world?
 
 ## Deployment
 
-- Branch deploys
-- Netlify forms
-- Custom functions
+The whole reason we started building Redwood was to make full-stack webapps easier to build and deploy on the JAMstack. You've seen what building a Redwood app is like, how about we try deploying one?
 
-### Authentication
+Before we continue make sure your app is fully commited on live somewhere on GitHub, GitLab or Bitbucket. We're going to link Netlify directly to our git repo so that a simple push to `master` will re-deploy our site! If you haven't worked on the JAMstack yet you're in for a pleasent surprise!
+
+### The Database
+
+We'll need a database somewhere on the internet to store our data. Locally we've been using SQLite but that's meant to be a single-user, disc-based store and isn't suited for the kind of connection and concurrency requirements a real, live website will require. For the purposes we're going to use Postgres. Don't worry if you aren't familiar with Postgres, Prisma will do all the heavy lifting, we just need to get one available to the outside world so it can be accessed by our app.
+
+There are several hosting providers where you can quickly start up a Postgres instance:
+
+- [Heroku](https://www.heroku.com/postgres)
+- [Digital Ocean](https://www.digitalocean.com/products/managed-databases)
+- [AWS](https://aws.amazon.com/rds/postgresql/)
+
+We're going to go with Heroku for now because it's a) free and b) easier to get started from scratch than AWS.
+
+Head over to [Heroku](https://signup.heroku.com/) and create an account or log in. Then click that "Create a new app" button:
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 22 36 PM" src="https://user-images.githubusercontent.com/300/73703866-438c3900-46a6-11ea-9a90-bdab2fed8bff.png">
+
+Give it a name like "redwoodblog" if it's available. Then we're going to click "Find more add-ons":
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 23 25 PM" src="https://user-images.githubusercontent.com/300/73703877-4e46ce00-46a6-11ea-87c0-079346f4d9b3.png">
+
+And scroll down to "Heroku Postgres":
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 23 48 PM" src="https://user-images.githubusercontent.com/300/73703883-556ddc00-46a6-11ea-8777-ee27d2202e0e.png">
+
+Click that, and tell it you want to connect it to the app you just created, then click "Provision add-on":
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 24 15 PM" src="https://user-images.githubusercontent.com/300/73703930-64548e80-46a6-11ea-9f1b-e06a183834f4.png">
+
+You'll be returned to your app's detail page. You should be on the "Resources" tab and see the Heroku Postgres add-on ready to go:
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 24 43 PM" src="https://user-images.githubusercontent.com/300/73703951-6ae30600-46a6-11ea-8d9b-a900b7af2ac5.png">
+
+Click the "Heroku Postgres" link to get to the detail page, then the "Settings" tab and finally the "View Credentials..." button. We did all the steps above so that we could copy the URI listed at the bottom:
+
+<img width="500" alt="Screen Shot 2020-02-03 at 3 25 31 PM" src="https://user-images.githubusercontent.com/300/73703956-70405080-46a6-11ea-81f2-bed99ca4c4cc.png">
+
+It will be really long and scroll off the right side of the page so make sure you copy the whole thing!
+
+### Netlify
+
+Now we're going to (create a Netlify account)[https://app.netlify.com/signup] if you don't have one already. Once you've signed up and verified your email done just click the "New site from Git" button at the upper right:
+
+<img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" width="500" />
+
+Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to "Settings" at the top and then "Build & Deploy" > "Environment". Click "Edit Variables" and this is where we'll paste the database connection URI we got from Heroku (note the "Key" is "DB_HOST"):
+
+<img src="https://user-images.githubusercontent.com/300/73705038-9e735f80-46a9-11ea-9f38-17c15c2afe9a.png" width="500" />
+
+Click "Save" and you should see the new variable listed:
+
+<img src="https://user-images.githubusercontent.com/300/73704961-77b52900-46a9-11ea-98f9-7150a7ddf572.png" width="500" />
+
+Back to the "Deploys" tab at the top. Open the "Trigger deploy" dropdown and click "Clear cache and deploy site":
+
+<img src="https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png" width="500" />
+
+This will take you to the log output showing the site being built. With a little luck (and SCIENCE) it will completely successfully! Go back and click the URL of your Netlify site towards the top:
+
+<img width="500" alt="Screen Shot 2020-02-03 at 5 24 28 PM" src="https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png">
+
+Did it work! Yay! If the deploy failed, check the log output and see if you can make sense of the error. If the deploy was successful but the site doesn't come up, try opening the web inspector and look for errors. Are you sure you pasted the entire Postgres connection string correctly?
+
+### Push to Deploy
+
+Now that our site is deployed to Netlify we have the amazing benefit of deploying whenever we push to `master`. Try it now! Change some text in `BlogLayout`, commit and push. If you go to the "Deploys" tab in Netlify you should see it appear with a "Building" badge. A couple of minutes later and your site is live!
+
+Another neat feature is Branch Deploys. When you create a branch and push it up to your repo, Netlify will build that branch at a unique URL so that you can test your changes, leaving the main site alone. Once your branch is merged to `master` then a deploy at your main site will run and your changes will show to the world.
+
+> You also have the ability to "lock" the `master` branch so that deploys do not automatically occur on every push—you need to manually tell Netlify to deploy the latest, either by going to the site or using the [Netlify CLI](https://cli.netlify.com/).
+
+### Netlify Forms
+
+- Convert contact form
+- Work in branch, branch deploy, merge PR
+
+## Authentication
 
 "Authentication" is a blanket term for all of the stuff that goes into making sure that a user, often identified with an email address and password, is allowed to do something they want to do. Authentication can be [famously fickle](https://www.rdegges.com/2017/authentication-still-sucks/) to do right both from a technical standpoint and developer happiness standpoint.
 
