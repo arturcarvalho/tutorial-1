@@ -52,7 +52,7 @@ Within `api` there are two directories:
 
 - `prisma` contains the plumbing for the database:
 
-  - `dev.db` is the local development SQLite database (created with the `yarn db:up` command we ran earlier)
+  - `dev.db` is the local development SQLite database (created with the `yarn db up` command we ran earlier)
   - `schema.prisma` contains the database schema (tables and columns)
   - `seeds.js` is used to populate your database with any data that needs to exist for your app to run at all (maybe an admin user or site configuration).
 
@@ -355,7 +355,7 @@ datasource DS {
 }
 
 generator photonjs {
-  provider = "photonjs"
+  provider = "prisma-client-js"
 }
 
 model Post {
@@ -383,13 +383,13 @@ This says that we want a table called `Post` and it should have:
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    yarn redwood db save
+    yarn redwood db migrate save
 
 When it asks what you want to name this migration its for your own benefit—Redwood doesn't care about the migration's name, it's just a reference for future developers. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory created under `api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Prisma Migrate will use make the change to the database in `steps.json`).
 
 We apply the migration with another command:
 
-    yarn rw db:up
+    yarn rw db migrate up
 
 > From now on we'll use the shorter `rw` alias instead of the full `redwood` name.
 
@@ -1533,11 +1533,11 @@ model Contact {
 
 Next we create a migration file:
 
-    yarn rw db:save
+    yarn rw db migrate save
 
 The command will ask for a name again. How about "create contact"? Finally we execute the migration to run the DDL commands to upgrade the database:
 
-    yarn rw db:up
+    yarn rw db migrate up
 
 Now we'll create the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
