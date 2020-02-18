@@ -1,6 +1,6 @@
 # Redwood Tutorial
 
-> This tutorial is aspirational and helps us plan Redwood development. Please consider it read-only for now as much of the featured functionality is still being built.
+> NOTE: This tutorial should mostly work as advertised, but it is still under development, and there are several known issues. If you have any feedback about understandability, we would love to hear it. Feel free to open an issue.
 
 Welcome to Redwood! If you haven't yet, check out the [Redwood README](https://github.com/redwoodjs/redwood/blob/master/README.md) to get a little background on why we created Redwood and the problems it's meant to solve. Redwood brings several existing technologies together for the first time into what we think is the future of database-backed single page applications.
 
