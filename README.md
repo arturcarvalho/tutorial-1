@@ -903,6 +903,8 @@ export const Success = ({ post }) => {
 
 And there we go! We should be able to move back and forth between the homepage and the detail page.
 
+> If you like what you've been seeing from the router, you can dive deeper into the [Redwood Router Docs](https://github.com/redwoodjs/redwood/tree/master/packages/router).
+
 Let's summarize:
 
 1. We created a new page to show a single post (the "detail" page).
