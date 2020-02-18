@@ -31,6 +31,8 @@ Open up a browser to http://localhost:8910 and you will see the Redwood welcome 
 
 <img src="https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png" width="500" />
 
+> Remembering the port number is as easy as counting: 8-9-10!
+
 Now that we have the skeleton of our Redwood app in place, it's a good idea to save the current state of the app as your first commit...just in case.
 
     git init
