@@ -387,13 +387,13 @@ This says that we want a table called `Post` and it should have:
 
 That was simple. Now we'll want to snapshot this as a migration:
 
-    yarn redwood db migrate save
+    yarn redwood db save
 
 When it asks what you want to name this migration its for your own benefit—Redwood doesn't care about the migration's name, it's just a reference for future developers. Something like "create posts" is perfect. After the command completes you'll see a new subdirectory created under `api/prisma/migrations` that has a timestamp and the name you gave the migration. It will contain a couple files inside (a snapshot of what the schema looked like at that point in time in `schema.prisma` and the directives that Prisma Migrate will use make the change to the database in `steps.json`).
 
 We apply the migration with another command:
 
-    yarn rw db migrate up
+    yarn rw db up
 
 > From now on we'll use the shorter `rw` alias instead of the full `redwood` name.
 
@@ -1539,11 +1539,11 @@ model Contact {
 
 Next we create a migration file:
 
-    yarn rw db migrate save
+    yarn rw db save
 
 The command will ask for a name again. How about "create contact"? Finally we execute the migration to run the DDL commands to upgrade the database:
 
-    yarn rw db migrate up
+    yarn rw db up
 
 Now we'll create the GraphQL interface to access this table. We haven't used this `generate` command yet (although the `scaffold` command did use it behind the scenes):
 
