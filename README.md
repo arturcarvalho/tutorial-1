@@ -29,7 +29,7 @@ You'll have a new directory `redwoodblog` containing several directories and fil
 
 Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
 
-<img src="https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png" />
 
 > Remembering the port number is as easy as counting: 8-9-10!
 
@@ -104,7 +104,7 @@ This does two things:
 
 In fact this page is already live (your browser automatically reloaded):
 
-<img src="https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png" />
 
 It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text.
 
@@ -423,27 +423,27 @@ Let's generate everything we need to perform all the CRUD (Create, Retrieve, Upd
 
 Let's point the browser to `http://localhost:8910/posts` and see what we have:
 
-<img src="https://user-images.githubusercontent.com/300/73027952-53c03080-3de9-11ea-8f5b-d62a3676bbef.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73027952-53c03080-3de9-11ea-8f5b-d62a3676bbef.png" />
 
 Well that's barely more than we got when we generated a page. What happens if we click that "New Post" button?
 
-<img src="https://user-images.githubusercontent.com/300/73028004-72262c00-3de9-11ea-8924-66d1cc1fceb6.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73028004-72262c00-3de9-11ea-8924-66d1cc1fceb6.png" />
 
 Okay, now we're getting somewhere. Fill in the title and body and click "Save".
 
-<img src="https://user-images.githubusercontent.com/300/73028757-08a71d00-3deb-11ea-8813-046c8479b439.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73028757-08a71d00-3deb-11ea-8813-046c8479b439.png" />
 
 Did we just create a post in the database? And then show that post here on this page? Yes, yes we did. Try creating another:
 
-<img src="https://user-images.githubusercontent.com/300/73028839-312f1700-3deb-11ea-8e83-0012a3cf689d.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73028839-312f1700-3deb-11ea-8e83-0012a3cf689d.png" />
 
 But what if we click "Edit" on one of those posts?
 
-<img src="https://user-images.githubusercontent.com/300/73031307-9802ff00-3df0-11ea-9dc1-ea9af8f21890.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73031307-9802ff00-3df0-11ea-9dc1-ea9af8f21890.png" />
 
 Okay but what if we click "Delete"?
 
-<img src="https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73031339-aea95600-3df0-11ea-9d58-475d9ef43988.png" />
 
 So, Redwood just created all the pages, components and services necessary to perform all CRUD actions on our posts table. No need to open a database GUI or login through a terminal window and write SQL froms scratch. Redwood calls these _scaffolds_. Pretty neat, right?
 
@@ -631,7 +631,7 @@ export default HomePage
 
 The browser should actually show an array with a number or two (assuming you created a blog post with our [scaffolding](#Scaffolding-a-Post-Editor) from earlier). Neat!
 
-<img src="https://user-images.githubusercontent.com/300/73210519-5380a780-40ff-11ea-8639-968507a79b1f.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73210519-5380a780-40ff-11ea-8639-968507a79b1f.png" />
 
 > **In the `Success` component, where did `posts` come from?**
 >
@@ -668,7 +668,7 @@ export const QUERY = gql`
 
 The page should now show a dump of all the data you created for any blog posts you scaffolded:
 
-<img src="https://user-images.githubusercontent.com/300/73210715-abb7a980-40ff-11ea-82d6-61e6bdcd5739.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73210715-abb7a980-40ff-11ea-82d6-61e6bdcd5739.png" />
 
 Now we're in the realm of good ol' React components, so just build out the `Success` component to display the blog post in a nicer format:
 
@@ -690,7 +690,7 @@ export const Success = ({ posts }) => {
 
 And just like that we have a blog! It may be the most basic, ugly blog that ever graced the internet, but it's something! (Don't worry, we've got more features to add.)
 
-<img src="https://user-images.githubusercontent.com/300/73210997-3dbfb200-4100-11ea-847a-602cbf59cb2a.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73210997-3dbfb200-4100-11ea-847a-602cbf59cb2a.png" />
 
 ### Summary
 
@@ -833,7 +833,7 @@ const BlogPostPage = ({ id }) => {
 
 We can prove it! Try going to the detail page for a post in the browser and—uh oh. Hmm:
 
-<img src="https://user-images.githubusercontent.com/300/73212685-96dd1500-4103-11ea-9108-4162470aeb6d.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73212685-96dd1500-4103-11ea-9108-4162470aeb6d.png" />
 
 Okay, it turns out that route params are extracted as strings from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `BlogPostCell`, but honestly, we can do better than that!
 
@@ -1049,7 +1049,7 @@ const ContactPage = (props) => {
 export default ContactPage
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73305498-108e0500-41cf-11ea-86a2-1075a3abaff0.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305498-108e0500-41cf-11ea-86a2-1075a3abaff0.png" />
 
 Something is showing! Still, pretty boring. How about adding a submit button?
 
@@ -1073,7 +1073,7 @@ const ContactPage = (props) => {
 export default ContactPage
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73305544-269bc580-41cf-11ea-821f-84f08bb9a5fb.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305544-269bc580-41cf-11ea-821f-84f08bb9a5fb.png" />
 
 We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up but we have no indication that the form submitted or what happened to the data. Next we'll get the data in our fields.
 
@@ -1102,7 +1102,7 @@ const ContactPage = (props) => {
 
 Now try filling in some data and submitting:
 
-<img src="https://user-images.githubusercontent.com/300/73305602-4632ee00-41cf-11ea-815a-6079576c60bc.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305602-4632ee00-41cf-11ea-815a-6079576c60bc.png" />
 
 Great! Let's turn this into a more useful form by adding a couple fields. We'll rename the existing one to "name" and add "email" and "message":
 
@@ -1134,7 +1134,7 @@ export default ContactPage
 
 See the new `<TextAreaField>` component here which generates an HTML `<textarea>` but that contains Redwood's form goodness. If we reload now our fields are there but there's no indication of which is which and everything is kind of jumbled together:
 
-<img src="https://user-images.githubusercontent.com/300/73305645-61056280-41cf-11ea-8be7-d1f4d55788c2.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305645-61056280-41cf-11ea-8be7-d1f4d55788c2.png" />
 
 Let's add some labels and just a tiny bit of styling to at least separate the fields onto their own lines.
 
@@ -1165,7 +1165,7 @@ return (
 )
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73305679-77abb980-41cf-11ea-95f7-8ea0e4bf2350.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305679-77abb980-41cf-11ea-95f7-8ea0e4bf2350.png" />
 
 That's a little better. Try filling out the form and submitting and you should get a console message with all three fields now.
 
@@ -1202,7 +1202,7 @@ return (
 )
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73305807-bf324580-41cf-11ea-94a8-f45a0506375d.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305807-bf324580-41cf-11ea-94a8-f45a0506375d.png" />
 
 Now when trying to submit there'll be message from the browser noting that a field must be filled in. This is better than nothing, but these messages can't be styled. Can we do better?
 
@@ -1314,7 +1314,7 @@ export default ContactPage
 
 Note that the `name` attribute matches the `name` of the input field above it. That's so it knows which field to display errors for. Try submitting that form now.
 
-<img src="https://user-images.githubusercontent.com/300/73305960-12a49380-41d0-11ea-977f-74078ad6ff04.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73305960-12a49380-41d0-11ea-977f-74078ad6ff04.png" />
 
 But this is just the beginning. Let's make sure folks realize this is an error message:
 
@@ -1360,7 +1360,7 @@ return (
 )
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73306040-3cf65100-41d0-11ea-99a9-9468bba82da7.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73306040-3cf65100-41d0-11ea-99a9-9468bba82da7.png" />
 
 You know what would be nice, if the input itself somehow displayed the fact that there was an error:
 
@@ -1409,7 +1409,7 @@ return (
 )
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73306358-eb01fb00-41d0-11ea-8615-08e396c24cef.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73306358-eb01fb00-41d0-11ea-8615-08e396c24cef.png" />
 
 Oooo, what if the _label_ could change as well? It can, but we'll need Redwood's custom `<Label>` component for that (note that `for` becomes `name` just like the other components). Don't forget the import:
 
@@ -1484,7 +1484,7 @@ const ContactPage = (props) => {
 export default ContactPage
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73306562-53e97300-41d1-11ea-8bdd-e149f6b439db.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73306562-53e97300-41d1-11ea-8bdd-e149f6b439db.png" />
 
 > In addition to `style` and `errorStyle` you can also use `className` and `errorClassName`
 
@@ -1529,7 +1529,7 @@ That is definitely not the end-all-be-all for email address validation, but pret
 />
 ```
 
-<img src="https://user-images.githubusercontent.com/300/73306774-be9aae80-41d1-11ea-8f72-ac783ec44e76.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73306774-be9aae80-41d1-11ea-8f72-ac783ec44e76.png" />
 
 You may have noticed that trying to submit a form with validation errors outputs nothing to the console—it's not actually submitting. Fix the errors and all is well.
 
@@ -1654,19 +1654,19 @@ Often it's nice to experiment and call your API in a more "raw" form before you 
 
 When you started development with `yarn redwood dev` you actually started a second process running at the same time. Open a new browser tab and head to http://localhost:8911/graphql This is Prisma's [GraphQL Playground](https://github.com/prisma-labs/graphql-playground), a web-based GUI for GraphQL APIs:
 
-<img src="https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/70950852-9b97af00-2016-11ea-9550-b6983ce664e2.png" />
 
 Not very exciting yet, but check out that "Docs" tab on the far right:
 
-<img src="https://user-images.githubusercontent.com/300/73311311-fce89b80-41da-11ea-9a7f-2ef6b8191052.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73311311-fce89b80-41da-11ea-9a7f-2ef6b8191052.png" />
 
 It's the complete schema as defined by our SDL files! The Playground will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
 
-<img src="https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png" />
 
 We should also be able to create a new contact:
 
-<img src="https://user-images.githubusercontent.com/300/73311826-471e4c80-41dc-11ea-9476-a9ef8cdfce20.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73311826-471e4c80-41dc-11ea-9476-a9ef8cdfce20.png" />
 
 The GraphQL Playground is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
 
@@ -1791,7 +1791,7 @@ return (
 
 It may be hard to see a difference in development because the submit is so fast, but you could enable network throttling via the Network tab Chrome's Web Inspector to simulate a slow connection:
 
-<img src="https://user-images.githubusercontent.com/300/71037869-6dc56f80-20d5-11ea-8b26-3dadb8a1ed86.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/71037869-6dc56f80-20d5-11ea-8b26-3dadb8a1ed86.png" />
 
 You'll see that the "Save" button become disabled for a second or two while waiting for the response.
 
@@ -1875,7 +1875,7 @@ To get a server error to fire, let's remove the email format validatation so tha
 
 Now try filling out the form with an invalid email address:
 
-<img src="https://user-images.githubusercontent.com/300/73316723-b601a280-41e8-11ea-8ed1-e3799821caa1.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73316723-b601a280-41e8-11ea-8ed1-e3799821caa1.png" />
 
 It ain't pretty, but it works. Seeing a "GraphQL error" is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
 
@@ -1907,7 +1907,7 @@ return (
 
 Now submit a message without a name:
 
-<img src="https://user-images.githubusercontent.com/300/73317487-1b569300-41eb-11ea-9fae-a9a7ae3c52f1.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73317487-1b569300-41eb-11ea-9fae-a9a7ae3c52f1.png" />
 
 > `<RedwoodFormError>` has several styling options which are attached to different parts of the message:
 >
@@ -2013,27 +2013,27 @@ We're going to go with Heroku for now because it's a) free and b) easier to get 
 
 Head over to [Heroku](https://signup.heroku.com/) and create an account or log in. Then click that "Create a new app" button:
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 22 36 PM" src="https://user-images.githubusercontent.com/300/73703866-438c3900-46a6-11ea-9a90-bdab2fed8bff.png">
+<img alt="Screen Shot 2020-02-03 at 3 22 36 PM" src="https://user-images.githubusercontent.com/300/73703866-438c3900-46a6-11ea-9a90-bdab2fed8bff.png">
 
 Give it a name like "redwoodblog" if it's available. Then we're going to click "Find more add-ons":
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 23 25 PM" src="https://user-images.githubusercontent.com/300/73703877-4e46ce00-46a6-11ea-87c0-079346f4d9b3.png">
+<img alt="Screen Shot 2020-02-03 at 3 23 25 PM" src="https://user-images.githubusercontent.com/300/73703877-4e46ce00-46a6-11ea-87c0-079346f4d9b3.png">
 
 And scroll down to "Heroku Postgres":
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 23 48 PM" src="https://user-images.githubusercontent.com/300/73703883-556ddc00-46a6-11ea-8777-ee27d2202e0e.png">
+<img alt="Screen Shot 2020-02-03 at 3 23 48 PM" src="https://user-images.githubusercontent.com/300/73703883-556ddc00-46a6-11ea-8777-ee27d2202e0e.png">
 
 Click that, and tell it you want to connect it to the app you just created, then click "Provision add-on":
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 24 15 PM" src="https://user-images.githubusercontent.com/300/73703930-64548e80-46a6-11ea-9f1b-e06a183834f4.png">
+<img alt="Screen Shot 2020-02-03 at 3 24 15 PM" src="https://user-images.githubusercontent.com/300/73703930-64548e80-46a6-11ea-9f1b-e06a183834f4.png">
 
 You'll be returned to your app's detail page. You should be on the "Resources" tab and see the Heroku Postgres add-on ready to go:
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 24 43 PM" src="https://user-images.githubusercontent.com/300/73703951-6ae30600-46a6-11ea-8d9b-a900b7af2ac5.png">
+<img alt="Screen Shot 2020-02-03 at 3 24 43 PM" src="https://user-images.githubusercontent.com/300/73703951-6ae30600-46a6-11ea-8d9b-a900b7af2ac5.png">
 
 Click the "Heroku Postgres" link to get to the detail page, then the "Settings" tab and finally the "View Credentials..." button. We did all the steps above so that we could copy the URI listed at the bottom:
 
-<img width="500" alt="Screen Shot 2020-02-03 at 3 25 31 PM" src="https://user-images.githubusercontent.com/300/73703956-70405080-46a6-11ea-81f2-bed99ca4c4cc.png">
+<img alt="Screen Shot 2020-02-03 at 3 25 31 PM" src="https://user-images.githubusercontent.com/300/73703956-70405080-46a6-11ea-81f2-bed99ca4c4cc.png">
 
 It will be really long and scroll off the right side of the page so make sure you copy the whole thing!
 
@@ -2041,23 +2041,23 @@ It will be really long and scroll off the right side of the page so make sure yo
 
 Now we're going to (create a Netlify account)[https://app.netlify.com/signup] if you don't have one already. Once you've signed up and verified your email done just click the "New site from Git" button at the upper right:
 
-<img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" />
 
 Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to "Settings" at the top and then "Build & Deploy" > "Environment". Click "Edit Variables" and this is where we'll paste the database connection URI we got from Heroku (note the "Key" is "DB_HOST"):
 
-<img src="https://user-images.githubusercontent.com/300/73705038-9e735f80-46a9-11ea-9f38-17c15c2afe9a.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73705038-9e735f80-46a9-11ea-9f38-17c15c2afe9a.png" />
 
 Click "Save" and you should see the new variable listed:
 
-<img src="https://user-images.githubusercontent.com/300/73704961-77b52900-46a9-11ea-98f9-7150a7ddf572.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73704961-77b52900-46a9-11ea-98f9-7150a7ddf572.png" />
 
 Back to the "Deploys" tab at the top. Open the "Trigger deploy" dropdown and click "Clear cache and deploy site":
 
-<img src="https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png" width="500" />
+<img src="https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png" />
 
 This will take you to the log output showing the site being built. With a little luck (and SCIENCE) it will completely successfully! Go back and click the URL of your Netlify site towards the top:
 
-<img width="500" alt="Screen Shot 2020-02-03 at 5 24 28 PM" src="https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png">
+<img alt="Screen Shot 2020-02-03 at 5 24 28 PM" src="https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png">
 
 Did it work! Yay! If the deploy failed, check the log output and see if you can make sense of the error. If the deploy was successful but the site doesn't come up, try opening the web inspector and look for errors. Are you sure you pasted the entire Postgres connection string correctly?
 
