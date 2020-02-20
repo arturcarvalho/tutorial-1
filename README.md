@@ -1,4 +1,4 @@
-# Redwood Tutorial
+# Welcome to Redwood
 
 > NOTE: This tutorial should mostly work as advertised, but it is still under development, and there are several known issues. If you have any feedback about understandability, we would love to hear it. Feel free to open an issue.
 
@@ -33,6 +33,8 @@ Open up a browser to http://localhost:8910 and you will see the Redwood welcome 
 
 > Remembering the port number is as easy as counting: 8-9-10!
 
+### First Commit
+
 Now that we have the skeleton of our Redwood app in place, it's a good idea to save the current state of the app as your first commit...just in case.
 
     git init
@@ -49,6 +51,8 @@ At the top level we have two directories, `api` and `web`. Redwood separates the
 
     yarn workspace web add marked
     yarn workspace api add better-fs
+
+### The /api Directory
 
 Within `api` there are two directories:
 
@@ -68,7 +72,9 @@ Within `api` there are two directories:
     > If you don't need GraphQL you can remove the `graphql.js` file, `graphql` directory, and the `apollo` package.
   - `services` contains business logic related to your data. When you're querying or mutating data for GraphQL, that code ends up here, but in a format that's resuable in other places in your application.
 
-That's it for the backend. Let's take a look at the frontend `web` directory:
+That's it for the backend.
+
+### The /web Directory
 
 - `components` contain your traditional React components as well as Redwood _Cells_ (more about those soon).
 - `layouts` contain HTML/components that wrap your content and are shared across _Pages_.
@@ -100,7 +106,11 @@ In fact this page is already live (your browser automatically reloaded):
 
 <img src="https://user-images.githubusercontent.com/300/73023260-ff648300-3ddf-11ea-9961-0b7cd6399caa.png" width="500" />
 
-It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text. Open up `web/src/Routes.js` and take a look at the route that was created:
+It's not pretty, but it's a start! Open the page in your editor, change some text and save. Your browser should reload with your new text.
+
+### Routing
+
+Open up `web/src/Routes.js` and take a look at the route that was created:
 
     <Route path="/" page={HomePage} name="home" />
 
@@ -156,6 +166,8 @@ Let's point out a few things here:
   `<Route path="/about" page={AboutPage} name="about" />`
 
   If you don't like the name that `redwood generate` used for your route, feel free to change it in `Routes.js`! Named routes are awesome because if you ever change the path associated with a route, you need only change it in `Routes.js` and every link using a named route function will still point to the correct place. You can also pass a string to the `to` attribute, but you'll lose out on all the Redwood goodness that named routes provide.
+
+### Back Home
 
 Once we get to the About page we don't have any way to get back so let's add a link there as well:
 
@@ -272,7 +284,7 @@ export default AboutPage
 
 Back to the browser and you should see...nothing different. But that's good, it means our layout is working.
 
-> ### Why are things named the way they are?
+> **Why are things named the way they are?**
 >
 > You may have noticed some duplication in Redwood's file names. Pages live in a directory called `/pages` and also contain `Page` in their name. Same with Layouts. What's the deal?
 >
@@ -281,6 +293,8 @@ Back to the browser and you should see...nothing different. But that's good, it 
 > If you're using the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) plugin this also helps disambiguate when browsing through your component stack:
 >
 > <img src="https://user-images.githubusercontent.com/300/73025189-f970a100-3de3-11ea-9285-15c1116eb59a.png" width="400">
+
+### Back Home Again
 
 One more `<Link>`, let's have the title/logo link back to the homepage as per usual:
 
@@ -678,6 +692,8 @@ And just like that we have a blog! It may be the most basic, ugly blog that ever
 
 <img src="https://user-images.githubusercontent.com/300/73210997-3dbfb200-4100-11ea-847a-602cbf59cb2a.png" width="500" />
 
+### Summary
+
 To sum up, what did we actually do to get this far?
 
 1. Generate the homepage
@@ -746,6 +762,8 @@ Cool, cool, cool. Now we need to construct a link that has the ID of a post in i
 ```
 
 For routes with route parameters, the named route function expects an object where you specify a value for each parameter. If you click on the link now, it will indeed take you to `/blog-post/1` (or `/blog-post/2`, etc, depending on the ID of the post).
+
+### Using the Param
 
 Ok, so the ID is in the URL. What do we need next in order to display a specific post? It sounds like we'll be doing some data retrieval from the database, which means we want a cell:
 
@@ -819,6 +837,8 @@ We can prove it! Try going to the detail page for a post in the browser and—uh
 
 Okay, it turns out that route params are extracted as strings from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `BlogPostCell`, but honestly, we can do better than that!
 
+### Route Param Types
+
 What if you could request the conversion right in the route's path? Well, guess what: you can! Introducing **route param types**. It's as easy as adding `:Int` to our existing route param:
 
 ```javascript
@@ -832,20 +852,22 @@ Voilá! Not only will this convert the `id` param to a number before passing it 
 > **What if I want to pass some other prop to the cell that I don't need in the query, but do need in the Success/Loader/etc. components?**
 >
 > All of the props you give to the cell will be automatically available as props in the render components. Only the ones that match the GraphQL variables list will be given to the query. You get the best of both worlds! In our post display above, if you wanted to display some random number along with the post (for some contrived, tutorial-like reason), just pass that prop:
-
-```javascript
-<BlogPostCell id={id} rand={Math.random()}>
-```
-
+>
+>```javascript
+><BlogPostCell id={id} rand={Math.random()}>
+>```
+>
 > And get it, along with the query result (and even the original `id` if you want) in the component:
-
-```javascript
-export const Success = ({ post, id, rand }) => {
-  //...
-}
-```
-
+>
+>```javascript
+>export const Success = ({ post, id, rand }) => {
+>  //...
+>}
+>```
+>
 > Thanks again, Redwood!
+
+### Displaying a Blog Post
 
 Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Redwood-up a component (I just invented that phrase):
 
@@ -904,6 +926,8 @@ export const Success = ({ post }) => {
 And there we go! We should be able to move back and forth between the homepage and the detail page.
 
 > If you like what you've been seeing from the router, you can dive deeper into the [Redwood Router Docs](https://github.com/redwoodjs/redwood/tree/master/packages/router).
+
+### Summary
 
 Let's summarize:
 
@@ -1223,7 +1247,11 @@ return (
 )
 ```
 
-And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want! Introducing `<FieldError>` (don't forget to include it in the `import` statement at the top):
+And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want!
+
+### \<FieldError\>
+
+Introducing `<FieldError>` (don't forget to include it in the `import` statement at the top):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -1461,6 +1489,8 @@ export default ContactPage
 > In addition to `style` and `errorStyle` you can also use `className` and `errorClassName`
 
 You might notice that the labels became lowercase. By default when you use `<Label>` as a self-closing tag (with no text content and closing `</Label>`) it will use the `name` attribute as the text label.
+
+### Validating Input Format
 
 We should make sure the email field actually contains an email:
 
@@ -1777,6 +1807,8 @@ const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
 })
 ```
 
+### Displaying Server Errors
+
 Finally, let's let the user know if a server error occurs. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place RedwoodForm can't know about those, but we still need to let the user know something went wrong.
 
 We have email validation on the client, but any good developer knows _never trust the client_. Let's add the email validation on the API as well to be sure no bad data gets into our database, even if someone somehow bypassed our client-side validation.
@@ -2037,11 +2069,6 @@ Another neat feature is Branch Deploys. When you create a branch and push it up 
 
 > You also have the ability to "lock" the `master` branch so that deploys do not automatically occur on every push—you need to manually tell Netlify to deploy the latest, either by going to the site or using the [Netlify CLI](https://cli.netlify.com/).
 
-### Netlify Forms
-
-- Convert contact form
-- Work in branch, branch deploy, merge PR
-
 ## Authentication
 
 "Authentication" is a blanket term for all of the stuff that goes into making sure that a user, often identified with an email address and password, is allowed to do something they want to do. Authentication can be [famously fickle](https://www.rdegges.com/2017/authentication-still-sucks/) to do right both from a technical standpoint and developer happiness standpoint.
@@ -2103,8 +2130,3 @@ There are a few things we need to do to get ready for an authenticated user:
 - Keep track of details for the logged in user (maybe show a "Welcome, [Name]" in the corner)
 
 The first is figure out a place to put our authentication code so that it blocks access to all of our admin screens.
-
-# Cookbook Stuff
-
-Use third party API
-Use third party GraphQL service
