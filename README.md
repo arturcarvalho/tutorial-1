@@ -472,10 +472,10 @@ Here's what happened when we ran that `yarn rw g scaffold post` command:
 > As far as the generators are concerned:
 >
 > - Services are always plural.
-> - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`)
+> - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`).
 > - SDL filenames are plural.
-> - Pages are plural or singular depending on whether they deal with many or one post
-> - Layouts are singular
+> - Pages are plural or singular depending on whether they deal with many or one post.
+> - Layouts are singular.
 > - Components, like pages, will be plural or singular depending on context.
 >
 > Also note that it's the database table name that's singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
