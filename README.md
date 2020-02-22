@@ -2039,7 +2039,7 @@ It will be really long and scroll off the right side of the page so make sure yo
 
 ### Netlify
 
-Now we're going to (create a Netlify account)[https://app.netlify.com/signup] if you don't have one already. Once you've signed up and verified your email done just click the "New site from Git" button at the upper right:
+Now we're going to [create a Netlify account](https://app.netlify.com/signup) if you don't have one already. Once you've signed up and verified your email done just click the "New site from Git" button at the upper right:
 
 <img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" />
 
