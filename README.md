@@ -47,7 +47,7 @@ Let's take a look at the files and directories that were created for us (config 
 
 <img src="https://user-images.githubusercontent.com/300/73015308-9e817e80-3dd0-11ea-8650-3d86eee1e2c1.png" alt="redwoodblog directory structure" width="300">
 
-At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. [Yarn refers to these as "workspaces"](https://yarnpkg.com/lang/en/docs/workspaces/). When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
+At the top level we have two directories, `api` and `web`. Redwood separates the backend (`api`) and frontend (`web`) concerns into their own paths in the codebase. ([Yarn refers to these as "workspaces"](https://yarnpkg.com/lang/en/docs/workspaces/). In Redwood, we refer to them as "sides.") When you add packages going forward you'll need to specify which workspace they should go in. For example (don't run these commands, we're just looking at the syntax):
 
     yarn workspace web add marked
     yarn workspace api add better-fs
@@ -58,9 +58,9 @@ Within `api` there are two directories:
 
 - `prisma` contains the plumbing for the database:
 
-  - `dev.db` is the local development SQLite database (created with the `yarn db up` command we ran earlier)
   - `schema.prisma` contains the database schema (tables and columns)
-  - `seeds.js` is used to populate your database with any data that needs to exist for your app to run at all (maybe an admin user or site configuration).
+  - `seeds.js` is used to populate your database with any data that needs to exist for your app to run at all (maybe an admin user or site configuration).  
+  - `dev.db` is the local development SQLite database. This file *has not been created yet*, but it will be once we run `db` commands later on.
 
   After we add our first database table there will also be a `migrations` directory created for us. It contains the files that act as snapshots of the database schema changing over time.
 
@@ -84,6 +84,7 @@ That's it for the backend.
 - `public` contains assets not used by React components (they will be copied over unmodified to the final app's root directory):
   - `favicon.png` is the icon that goes in a browser tab when your page is open (apps start with the RedwoodJS logo).
   - `robots.txt` can be used to control what web indexers are allowed to do.
+  - `README.md` explains how, and when, to use the `public` folder for static assets. It also covers best practices for importing assets within components via Webpack. [To read it on Github, click here.](https://github.com/redwoodjs/create-redwood-app/tree/master/web/public)
 - `index.css` is a generic place to put your CSS, but there are many options.
 - `index.html` is the standard React starting point for our app.
 - `index.js` the bootstraping code to get our Redwood app up and running.
@@ -213,7 +214,7 @@ As a world-class developer you probably saw that copy and pasted `<header>` and 
 
 One way to solve the `<header>` dilemma would be to create a `<Header>` component and include it in both `HomePage` and `AboutPage`. That works, but is there a better solution? Ideally there should only be one reference to the `<header>` anywhere in our code.
 
-When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes "before" (a `<header>`) or "after" (a `<footer>`). That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
+When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes "before" `<header>` or "after" `<footer>`. That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
 
 <img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" width="300">
 
@@ -264,7 +265,8 @@ const HomePage = () => {
 }
 
 export default HomePage
-
+```
+```javascript
 // web/src/pages/AboutPage/AboutPage.js
 import { Link, routes } from '@redwoodjs/router'
 import BlogLayout from 'src/layouts/BlogLayout'
@@ -376,6 +378,7 @@ datasource DS {
 
 generator photonjs {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 model Post {
