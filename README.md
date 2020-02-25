@@ -29,7 +29,7 @@ You'll have a new directory `redwoodblog` containing several directories and fil
 
 Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
 
-<img src="https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png" />
+![Redwood Welcome Page](https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png)
 
 > Remembering the port number is as easy as counting: 8-9-10!
 
@@ -853,17 +853,17 @@ Voilá! Not only will this convert the `id` param to a number before passing it 
 >
 > All of the props you give to the cell will be automatically available as props in the render components. Only the ones that match the GraphQL variables list will be given to the query. You get the best of both worlds! In our post display above, if you wanted to display some random number along with the post (for some contrived, tutorial-like reason), just pass that prop:
 >
->```javascript
-><BlogPostCell id={id} rand={Math.random()}>
->```
+> ```javascript
+> <BlogPostCell id={id} rand={Math.random()}>
+> ```
 >
 > And get it, along with the query result (and even the original `id` if you want) in the component:
 >
->```javascript
->export const Success = ({ post, id, rand }) => {
->  //...
->}
->```
+> ```javascript
+> export const Success = ({ post, id, rand }) => {
+>   //...
+> }
+> ```
 >
 > Thanks again, Redwood!
 
