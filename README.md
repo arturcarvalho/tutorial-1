@@ -59,8 +59,8 @@ Within `api` there are two directories:
 - `prisma` contains the plumbing for the database:
 
   - `schema.prisma` contains the database schema (tables and columns)
-  - `seeds.js` is used to populate your database with any data that needs to exist for your app to run at all (maybe an admin user or site configuration).  
-  - `dev.db` is the local development SQLite database. This file *has not been created yet*, but it will be once we run `db` commands later on.
+  - `seeds.js` is used to populate your database with any data that needs to exist for your app to run at all (maybe an admin user or site configuration).
+  - `dev.db` is the local development SQLite database. This file _has not been created yet_, but it will be once we run `db` commands later on.
 
   After we add our first database table there will also be a `migrations` directory created for us. It contains the files that act as snapshots of the database schema changing over time.
 
@@ -266,6 +266,7 @@ const HomePage = () => {
 
 export default HomePage
 ```
+
 ```javascript
 // web/src/pages/AboutPage/AboutPage.js
 import { Link, routes } from '@redwoodjs/router'
@@ -1009,24 +1010,24 @@ export default ContactPage
 
 Double check that everything looks good and then let's get to the good stuff.
 
-### Introducing RedwoodForm
+### Introducing Form Helpers
 
 Forms in React are infamously annoying to work with. There are [Controlled Components](https://reactjs.org/docs/forms.html#controlled-components) and [Uncontrolled Components](https://reactjs.org/docs/uncontrolled-components.html) and [third party libraries](https://jaredpalmer.com/formik/) and many more workarounds to try and make forms in React as simple as they were originally intended to be: an `<input>` field with a `name` attribute that gets submitted somewhere when you click a button.
 
 We think Redwood is a step or two in the right direction by not only freeing you from writing controlled component plumbing, but also dealing with validation and errors automatically. Let's see how it works.
 
-For now we won't be talking to the database in our Contact form so we won't create a cell. Let's create the form right on the page. Redwood forms start with the...wait for it...`<RedwoodForm>` tag:
+For now we won't be talking to the database in our Contact form so we won't create a cell. Let's create the form right on the page. Redwood forms start with the...wait for it...`<Form>` tag:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-import { RedwoodForm } from '@redwoodjs/web'
+import { Form } from '@redwoodjs/web'
 import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   return (
     <BlogLayout>
-      <RedwoodForm></RedwoodForm>
+      <Form></Form>
     </BlogLayout>
   )
 }
@@ -1038,15 +1039,15 @@ Well that was anticlimactic. You can't even see it in the browser. Let's add a f
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
-import { RedwoodForm, TextField } from '@redwoodjs/web'
+import { Form, TextField } from '@redwoodjs/web'
 import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   return (
     <BlogLayout>
-      <RedwoodForm>
+      <Form>
         <TextField name="input" />
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1061,16 +1062,16 @@ Something is showing! Still, pretty boring. How about adding a submit button?
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-import { RedwoodForm, TextField, Submit } from '@redwoodjs/web'
+import { Form, TextField, Submit } from '@redwoodjs/web'
 import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
   return (
     <BlogLayout>
-      <RedwoodForm>
+      <Form>
         <TextField name="input" />
         <Submit>Save</Submit>
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1084,7 +1085,7 @@ We have what might actually be considered a real, bonafide form here. Try typing
 
 ### onSubmit
 
-Similar to a plain HTML form we'll give `<RedwoodForm>` an `onSubmit` handler. That handler will be called with a single argument—an object containing all of the submitted form fields:
+Similar to a plain HTML form we'll give `<Form>` an `onSubmit` handler. That handler will be called with a single argument—an object containing all of the submitted form fields:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -1096,10 +1097,10 @@ const ContactPage = (props) => {
 
   return (
     <BlogLayout>
-      <RedwoodForm onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit}>
         <TextField name="input" />
         <Submit>Save</Submit>
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1114,7 +1115,7 @@ Great! Let's turn this into a more useful form by adding a couple fields. We'll 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-import { RedwoodForm, TextField, TextAreaField, Submit } from '@redwoodjs/web'
+import { Form, TextField, TextAreaField, Submit } from '@redwoodjs/web'
 import BlogLayout from 'src/layouts/BlogLayout'
 
 const ContactPage = (props) => {
@@ -1124,12 +1125,12 @@ const ContactPage = (props) => {
 
   return (
     <BlogLayout>
-      <RedwoodForm>
+      <Form>
         <TextField name="name" />
         <TextField name="email" />
         <TextAreaField name="message" />
         <Submit>Save</Submit>
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1148,7 +1149,7 @@ Let's add some labels and just a tiny bit of styling to at least separate the fi
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit}>
       <label for="name" style={{ display: 'block' }}>
         Name
       </label>
@@ -1165,7 +1166,7 @@ return (
       <TextAreaField name="message" style={{ display: 'block' }} />
 
       <Submit style={{ display: 'block' }}>Save</Submit>
-    </RedwoodForm>
+    </Form>
   </BlogLayout>
 )
 ```
@@ -1185,7 +1186,7 @@ All three of these fields should be required in order for someone to send a mess
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit}>
       <label for="name" style={{ display: 'block' }}>
         Name
       </label>
@@ -1202,7 +1203,7 @@ return (
       <TextAreaField name="message" style={{ display: 'block' }} required />
 
       <Submit style={{ display: 'block' }}>Save</Submit>
-    </RedwoodForm>
+    </Form>
   </BlogLayout>
 )
 ```
@@ -1218,7 +1219,7 @@ Yes! Let's update that `required` call to instead be an object we pass to a cust
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit}>
       <label for="name" style={{ display: 'block' }}>
         Name
       </label>
@@ -1247,7 +1248,7 @@ return (
       />
 
       <Submit style={{ display: 'block' }}>Save</Submit>
-    </RedwoodForm>
+    </Form>
   </BlogLayout>
 )
 ```
@@ -1262,7 +1263,7 @@ Introducing `<FieldError>` (don't forget to include it in the `import` statement
 // web/src/pages/ContactPage/ContactPage.js
 
 import {
-  RedwoodForm,
+  Form,
   TextField,
   TextAreaField,
   Submit,
@@ -1277,7 +1278,7 @@ const ContactPage = (props) => {
 
   return (
     <BlogLayout>
-      <RedwoodForm onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit}>
         <label htmlFor="name" style={{ display: 'block' }}>
           Name
         </label>
@@ -1309,7 +1310,7 @@ const ContactPage = (props) => {
         <FieldError name="message" />
 
         <Submit style={{ display: 'block' }}>Save</Submit>
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1321,14 +1322,14 @@ Note that the `name` attribute matches the `name` of the input field above it. T
 
 <img src="https://user-images.githubusercontent.com/300/73305960-12a49380-41d0-11ea-977f-74078ad6ff04.png" />
 
-But this is just the beginning. Let's make sure folks realize this is an error message:
+But this is just the beginning. Let's make sure folks realize this is an error message (see the new `style` attributes):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit}>
       <label for="name" style={{ display: 'block' }}>
         Name
       </label>
@@ -1360,21 +1361,21 @@ return (
       <FieldError name="message" style={{ color: 'red' }} />
 
       <Submit style={{ display: 'block' }}>Save</Submit>
-    </RedwoodForm>
+    </Form>
   </BlogLayout>
 )
 ```
 
 <img src="https://user-images.githubusercontent.com/300/73306040-3cf65100-41d0-11ea-99a9-9468bba82da7.png" />
 
-You know what would be nice, if the input itself somehow displayed the fact that there was an error:
+You know what would be nice, if the input itself somehow displayed the fact that there was an error. Check out the `errorStyle` attributes:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit}>
       <label for="name" style={{ display: 'block' }}>
         Name
       </label>
@@ -1409,7 +1410,7 @@ return (
       <FieldError name="message" style={{ color: 'red' }} />
 
       <Submit style={{ display: 'block' }}>Save</Submit>
-    </RedwoodForm>
+    </Form>
   </BlogLayout>
 )
 ```
@@ -1422,7 +1423,7 @@ Oooo, what if the _label_ could change as well? It can, but we'll need Redwood's
 // web/src/pages/ContactPage/ContactPage.js
 
 import {
-  RedwoodForm,
+  Form,
   TextField,
   TextAreaField,
   Submit,
@@ -1438,7 +1439,7 @@ const ContactPage = (props) => {
 
   return (
     <BlogLayout>
-      <RedwoodForm onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit}>
         <Label
           name="name"
           style={{ display: 'block' }}
@@ -1481,7 +1482,7 @@ const ContactPage = (props) => {
         <FieldError name="message" style={{ color: 'red' }} />
 
         <Submit style={{ display: 'block' }}>Save</Submit>
-      </RedwoodForm>
+      </Form>
     </BlogLayout>
   )
 }
@@ -1543,7 +1544,7 @@ Finally, you know what would _really_ be nice: if the fields were validated as s
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+<Form onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
 ```
 
 Well, what do you think? Was it worth the hype? A couple of new components and you've got forms that handle validation and wrap up submitted values in a nice data object, all for free.
@@ -1699,7 +1700,7 @@ Next we'll call the `useMutation` hook provided by Apollo which will allow us to
 // web/src/pages/ContactPage/ContactPage.js
 
 import {
-  RedwoodForm,
+  Form,
   TextField,
   TextAreaField,
   Submit,
@@ -1734,7 +1735,7 @@ create({
 })
 ```
 
-If you'll recall `<RedwoodForm>` gives us all of the fields in a nice object where the key is the name of the field, which means the `data` object we're receiving in `onSubmit` is already in the proper format that we need for the `input`!
+If you'll recall `<Form>` gives us all of the fields in a nice object where the key is the name of the field, which means the `data` object we're receiving in `onSubmit` is already in the proper format that we need for the `input`!
 
 Now we can update the `onSubmit` function to invoke the mutation with the data it receives:
 
@@ -1814,7 +1815,7 @@ const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
 
 ### Displaying Server Errors
 
-Finally, let's let the user know if a server error occurs. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place RedwoodForm can't know about those, but we still need to let the user know something went wrong.
+Finally, let's let the user know if a server error occurs. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place Form can't know about those, but we still need to let the user know something went wrong.
 
 We have email validation on the client, but any good developer knows _never trust the client_. Let's add the email validation on the API as well to be sure no bad data gets into our database, even if someone somehow bypassed our client-side validation.
 
@@ -1856,7 +1857,7 @@ We already capture any existing error in the `error` constant that we got from `
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
-<RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
+<Form onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
   { error && (
     <div style={{ color: 'red' }}>We couldn't send your message: {error.message}</div>
   )}
@@ -1884,29 +1885,29 @@ Now try filling out the form with an invalid email address:
 
 It ain't pretty, but it works. Seeing a "GraphQL error" is not ideal, and it would be nice if the field itself was highlighted like it was when the inline validation was in place...
 
-Remember when we said that `<RedwoodForm>` had one more trick up its sleeve? Here it comes!
+Remember when we said that `<Form>` had one more trick up its sleeve? Here it comes!
 
-Remove the inline error display we just added (`{ error && ...`) and replace it with `<RedwoodFormError>`, passing the `error` constant we got from `useMutation` and a little bit of styling to `wrapperStyle` (don't forget the `import`). We'll also pass `error` to `<RedwoodForm>` so it can setup a context:
+Remove the inline error display we just added (`{ error && ...`) and replace it with `<FormError>`, passing the `error` constant we got from `useMutation` and a little bit of styling to `wrapperStyle` (don't forget the `import`). We'll also pass `error` to `<Form>` so it can setup a context:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 import {
-  RedwoodForm,
+  Form,
   TextField,
   TextAreaField,
   Submit,
   FieldError,
   Label,
-  RedwoodFormError,
+  FormError,
 } from '@redwoodjs/web'
 
 // ...
 
 return (
   <BlogLayout>
-    <RedwoodForm onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
-      <RedwoodFormError error={error} wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }} />
+    <Form onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
+      <FormError error={error} wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }} />
     //...
 ```
 
@@ -1914,7 +1915,7 @@ Now submit a message without a name:
 
 <img src="https://user-images.githubusercontent.com/300/73317487-1b569300-41eb-11ea-9fae-a9a7ae3c52f1.png" />
 
-> `<RedwoodFormError>` has several styling options which are attached to different parts of the message:
+> `<FormError>` has several styling options which are attached to different parts of the message:
 >
 > - `wrapperStyle` / `wrapperClassName`: the container for the entire message
 > - `titleStyle` / `titleClassName`: the "Can't create new contact" title
@@ -1925,9 +1926,9 @@ We get that error message at the top saying something went wrong in plain englis
 
 ### One more thing...
 
-Since we're not redirecting after the form submits we should at least clear out the form fields. This requires we get access to a `reset()` function that's part of `react-hook-form` but we don't have access to it when using the simplest usage of `<RedwoodForm>` (like we're currently using).
+Since we're not redirecting after the form submits we should at least clear out the form fields. This requires we get access to a `reset()` function that's part of `react-hook-form` but we don't have access to it when using the simplest usage of `<Form>` (like we're currently using).
 
-`react-hook-form` has a hook called `useForm()` which is normally called for us within `RedwoodForm`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `RedwoodForm`. Here's how we do that.
+`react-hook-form` has a hook called `useForm()` which is normally called for us within `Form`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `Form`. Here's how we do that.
 
 First we'll import `useForm`:
 
@@ -1947,14 +1948,14 @@ const ContactPage = (props) => {
   //...
 ```
 
-Now we'll tell `<RedwoodForm>` to use the `formMethods` we just instantiated instead of doing it itself:
+Now we'll tell `<Form>` to use the `formMethods` we just instantiated instead of doing it itself:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
 
 return (
   <BlogLayout>
-    <RedwoodForm
+    <Form
       formMethods={formMethods}
       onSubmit={onSubmit}
       validation={{ mode: 'onBlur' }}
@@ -1977,7 +1978,7 @@ return (
   })
 ```
 
-That's it! (React Hook Form)[https://react-hook-form.com/] provides a bunch of (functionality)[https://react-hook-form.com/api] that even `<RedwoodForm>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<RedwoodForm>` so that it keeps working!
+That's it! (React Hook Form)[https://react-hook-form.com/] provides a bunch of (functionality)[https://react-hook-form.com/api] that even `<Form>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<Form>` so that it keeps working!
 
 The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
