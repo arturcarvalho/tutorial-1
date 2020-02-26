@@ -96,9 +96,10 @@ Let's give our users something to look at besides the Redwood welcome page. We'l
 
     yarn redwood generate page home /
 
-This does two things:
+This does three things:
 
 - Creates `web/src/pages/HomePage/HomePage.js`. Redwood takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
+- Creates a test file to go along with this new page component at `web/src/pages/HomePage/HomePage.test.js` with a single, passing test. Do _do_ write tests for your components, _don't you??_
 - Adds a `<Route>` in `web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
 > If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Redwood automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up the routes file.
@@ -224,9 +225,9 @@ Let's create a layout to hold that `<header>`:
 
 > From now on we'll use the shorter `g` alias instead of `generate`
 
-That created `web/src/layouts/BlogLayout/BlogLayout.js`. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
+That created `web/src/layouts/BlogLayout/BlogLayout.js` and an associated test file. We're calling this the "blog" layout because we may have other layouts at some point in the future (an "admin" layout, perhaps?).
 
-Cut the `<header>` from both `HomePage` and `AboutPage` and add it to the layout instead. Let's take out the duplicated `<main>` tag as well:
+Cut the `<header>` from both `HomePage` and `AboutPage` and paste it in the layout instead. Let's take out the duplicated `<main>` tag as well:
 
 ```javascript
 // web/src/layouts/BlogLayout/BlogLayout.js
@@ -397,7 +398,7 @@ This says that we want a table called `Post` and it should have:
 - A `body` field that will contain a `String`
 - A `createdAt` field that will be a `DateTime` and will `@default` to `now()` when we create a new record (so we don't have to set the time manually in our app)
 
-> For the tutorial we're keeping things simple and using an integer for our ID column. Some apps may want to use a GUID or a UUID which Prisma supports. In that case you would use `String` for the datatype instead of `Int` and use `cuid()` or `uuid()` instead of `autoincrement()`:
+> For the tutorial we're keeping things simple and using an integer for our ID column. Some apps may want to use a CUID or a UUID which Prisma supports. In that case you would use `String` for the datatype instead of `Int` and use `cuid()` or `uuid()` instead of `autoincrement()`:
 >
 > `id String @id @default(cuid())`
 >
@@ -480,11 +481,11 @@ Here's what happened when we ran that `yarn rw g scaffold post` command:
 > - Services are always plural.
 > - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`).
 > - SDL filenames are plural.
-> - Pages are plural or singular depending on whether they deal with many or one post.
-> - Layouts are singular.
-> - Components, like pages, will be plural or singular depending on context.
+> - Pages that come with the scaffolds are plural or singular depending on whether they deal with many or one post. When using the `page` generator it will stick with whatever name you give the command.
+> - Layouts use the name you give them on the comand line.
+> - Components and cells, like pages, will be plural or singular depending on context when created by the scaffold generator, otherwise they'll use the given name on the command line.
 >
-> Also note that it's the database table name that's singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
+> Also note that it's the database table name part that's singular or plural, not the whole word. So it's `PostsCell`, not `PostCells`.
 >
 > You don't have to follow this convention once you start creating your own parts but we recommend doing so. The Ruby on Rails community has come to love this nomenclature even though many people complained about it when first exposed to it. [Give it five minutes](https://signalvnoise.com/posts/3124-give-it-five-minutes).
 
@@ -559,7 +560,7 @@ The homepage displaying a list of posts is a perfect candidate for our first cel
 
     yarn rw g cell blog_posts
 
-This command will result in a new file at `/web/src/components/BlogPostsCell/BlogPostsCell.js` with some boilerplate to get you started:
+This command will result in a new file at `/web/src/components/BlogPostsCell/BlogPostsCell.js` (and a test file) with some boilerplate to get you started:
 
 ```javascript
 // web/src/components/BlogPostsCell/BlogPostsCell.js
@@ -590,7 +591,7 @@ export const Success = ({ blogPosts }) => {
 >     yarn rw g cell blogPosts
 >     yarn rw g cell BlogPosts
 >
-> You will need _some_ kind of indication that you're using more than one word. Calling `yarn redwood g cell blogposts` will generate a file at `web/src/components/Blogposts/Blogposts.js`
+> You will need _some_ kind of indication that you're using more than one word. Calling `yarn redwood g cell blogposts` will generate a file at `web/src/components/BlogpostsCell/BlogpostsCell.js`
 
 To get you off and running as quickly as possible the generator assumes you've got a root GraphQL query named the same thing as your cell and gives you the minimum query needed to get something out of the database. In this case it called the query `blogPosts` which is not a valid query name for our exising Posts SDL and Service. We'll have to rename that to just `posts` in both the query name and prop named in `Success`:
 
@@ -879,7 +880,7 @@ Now let's display the actual post instead of just dumping the query result. This
 
     yarn rw g component blog_post
 
-Which creates `web/src/components/BlogPost/BlogPost.js` as a super simple React component:
+Which creates `web/src/components/BlogPost/BlogPost.js` (and test!) as a super simple React component:
 
 ```javascript
 // web/src/components/BlogPost/BlogPost.js
@@ -893,7 +894,7 @@ export default BlogPost
 
 > You may notice we don't have any explict `import` statements for `React` itself. We (the Redwood dev team) got tired of constantly importing it over and over again in every file so we automatically import it for you!
 
-Let's take the post display code out of `PostsCell` and put it here instead, taking the `post` in as a prop:
+Let's take the post display code out of `BlogPostsCell` and put it here instead, taking the `post` in as a prop:
 
 ```javascript
 // web/src/components/BlogPost/BlogPost.js
@@ -1928,7 +1929,7 @@ We get that error message at the top saying something went wrong in plain englis
 
 Since we're not redirecting after the form submits we should at least clear out the form fields. This requires we get access to a `reset()` function that's part of `react-hook-form` but we don't have access to it when using the simplest usage of `<Form>` (like we're currently using).
 
-`react-hook-form` has a hook called `useForm()` which is normally called for us within `Form`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `Form`. Here's how we do that.
+`react-hook-form` has a hook called `useForm()` which is normally called for us within `<Form>`. In order to reset the form we need to invoke that hook ourselves. But the functionality that `useForm()` provides still needs to be used in `Form`. Here's how we do that.
 
 First we'll import `useForm`:
 
@@ -1948,7 +1949,7 @@ const ContactPage = (props) => {
   //...
 ```
 
-Now we'll tell `<Form>` to use the `formMethods` we just instantiated instead of doing it itself:
+Finally we'll tell `<Form>` to use the `formMethods` we just instantiated instead of doing it itself:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -1978,7 +1979,7 @@ return (
   })
 ```
 
-That's it! (React Hook Form)[https://react-hook-form.com/] provides a bunch of (functionality)[https://react-hook-form.com/api] that even `<Form>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<Form>` so that it keeps working!
+That's it! [React Hook Form](https://react-hook-form.com/) provides a bunch of [functionality](https://react-hook-form.com/api) that even `<Form>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<Form>` so that it keeps working!
 
 The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
