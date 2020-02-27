@@ -717,7 +717,87 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 
 ## Side Quest: How Redwood Works with Data
 
-(Investigation into how the GraphQL SDL files map to services, auto-generation of resolvers, etc. with some nice graphics.)
+Redwood likes GraphQL. We think it's the API of the future. Our GraphQL implementation is build with [Apollo](https://www.apollographql.com/). Here's how a typical GraphQL query works its way through your app:
+
+![Redwood Data Flow](https://user-images.githubusercontent.com/300/75402679-50bdd180-58ba-11ea-92c9-bb5a5f4da659.png)
+
+The front-end uses [Apollo Client](https://www.apollographql.com/docs/react/) to create a GraphQL payload sent to [Apollo Server](https://www.apollographql.com/docs/apollo-server/) running in a serverless lambda function some where in the cloud.
+
+The `*.sdl.js` files you create in `api/src/graphql` define the GraphQL [Object](https://www.apollographql.com/docs/tutorial/schema/#object-types), [Query](https://www.apollographql.com/docs/tutorial/schema/#the-query-type) and [Mutation](https://www.apollographql.com/docs/tutorial/schema/#the-mutation-type) types and thus the interface of your API.
+
+Normally you would manually write [resolvers](https://www.apollographql.com/docs/tutorial/resolvers/#what-is-a-resolver) that get and manipulate the data that will be returned. Redwood takes a different approach. It automatically writes the resolvers for you, one for each key in the `Query` and `Mutation` types:
+
+```
+// api/src/graphql/posts.sdl.js
+
+type Query {
+  posts: [Post]
+  post(id: Int!): Post
+}
+
+type Mutation {
+  createPost(input: PostInput!): Post
+  updatePost(id: Int!, input: PostInput!): Post
+  deletePost(id: Int!): Post
+}
+```
+
+In this example you would get five resolvers created for you:
+
+- `posts()`
+- `post(id)`
+- `createPost(input)`
+- `updatePost(id, input)`
+- `deletePost(id)`
+
+Where is the actual implementation of the resolvers? They are exported in the **service** with the same name.
+
+If you have have `api/src/graphql/posts.sdl.js` you'll also have `api/src/services/posts/posts.js` which exports the functions that will usually get your data from a database, but it can actually do anything you want, as long as it returns the proper types that Apollo expects based on what you defined in `posts.js.sdl`:
+
+```javascript
+// api/src/services/posts/posts.js
+
+export const posts = () => {
+  return db.post.findMany()
+}
+
+export const post = ({ id }) => {
+  return db.post.findOne({
+    where: { id: id },
+  })
+}
+
+export const createPost = ({ input }) => {
+  return db.post.create({
+    data: input,
+  })
+}
+
+export const updatePost = ({ id, input }) => {
+  return db.post.update({
+    data: input,
+    where: { id: id },
+  })
+}
+
+export const deletePost = ({ id }) => {
+  return db.post.delete({
+    where: { id: id },
+  })
+}
+```
+
+> Apollo assumes these functions return promises, which `db` (an instance of `PrismaClient`) does. Apollo waits for them to resolve before responding with your query results, so you don't need to worry about `async`/`await` or mess with callbacks yourself.
+
+You don't have to make each function in your service available via GraphQL—leave it out of your `Query` and `Mutation` types and it won't exist as far as GraphQL is concerned. But you could still use it yourself—services are just Javascript functions so you can use them anywhere you'd like:
+
+- In a custom lambda function
+- From another service
+- From a completely separate, custom API
+
+Back to our data flow: Apollo has called the resolver which, in our case, retrieved data from the database. Apollo digs into the object and returns only the key/values that were asked for in the GraphQL query. It then packages up the response in a GraphQL payload and returns it to the browser.
+
+If you're using a Redwood **cell** then this data will be available to you in your `Success` component ready to be looped through and/or displayed like any other React component.
 
 ## Displaying a Single Blog Post - Routing Params
 
