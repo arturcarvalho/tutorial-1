@@ -717,11 +717,11 @@ So far, other than a little HTML, we haven't had to do much by hand. And we espe
 
 ## Side Quest: How Redwood Works with Data
 
-Redwood likes GraphQL. We think it's the API of the future. Our GraphQL implementation is build with [Apollo](https://www.apollographql.com/). Here's how a typical GraphQL query works its way through your app:
+Redwood likes GraphQL. We think it's the API of the future. Our GraphQL implementation is built with [Apollo](https://www.apollographql.com/). Here's how a typical GraphQL query works its way through your app:
 
 ![Redwood Data Flow](https://user-images.githubusercontent.com/300/75402679-50bdd180-58ba-11ea-92c9-bb5a5f4da659.png)
 
-The front-end uses [Apollo Client](https://www.apollographql.com/docs/react/) to create a GraphQL payload sent to [Apollo Server](https://www.apollographql.com/docs/apollo-server/) running in a serverless lambda function some where in the cloud.
+The front-end uses [Apollo Client](https://www.apollographql.com/docs/react/) to create a GraphQL payload sent to [Apollo Server](https://www.apollographql.com/docs/apollo-server/) running in a serverless lambda function somewhere in the cloud.
 
 The `*.sdl.js` files you create in `api/src/graphql` define the GraphQL [Object](https://www.apollographql.com/docs/tutorial/schema/#object-types), [Query](https://www.apollographql.com/docs/tutorial/schema/#the-query-type) and [Mutation](https://www.apollographql.com/docs/tutorial/schema/#the-mutation-type) types and thus the interface of your API.
 
@@ -752,7 +752,7 @@ In this example you would get five resolvers created for you:
 
 Where is the actual implementation of the resolvers? They are exported in the **service** with the same name.
 
-If you have have `api/src/graphql/posts.sdl.js` you'll also have `api/src/services/posts/posts.js` which exports the functions that will usually get your data from a database, but it can actually do anything you want, as long as it returns the proper types that Apollo expects based on what you defined in `posts.js.sdl`:
+If you have `api/src/graphql/posts.sdl.js` you'll also have `api/src/services/posts/posts.js` which exports the functions that will usually get your data from a database, but it can do anything you want, as long as it returns the proper types that Apollo expects based on what you defined in `posts.js.sdl`:
 
 ```javascript
 // api/src/services/posts/posts.js
