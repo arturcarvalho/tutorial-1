@@ -2148,7 +2148,7 @@ Back to the "Deploys" tab at the top. Open the "Trigger deploy" dropdown and cli
 
 <img src="https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png" />
 
-This will take you to the log output showing the site being built. With a little luck (and SCIENCE) it will completely successfully! Go back and click the URL of your Netlify site towards the top:
+This will take you to the log output showing the site being built. With a little luck (and SCIENCE) it will complete successfully! Go back and click the URL of your Netlify site towards the top:
 
 <img alt="Screen Shot 2020-02-03 at 5 24 28 PM" src="https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png">
 
