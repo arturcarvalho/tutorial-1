@@ -27,7 +27,7 @@ You'll have a new directory `redwoodblog` containing several directories and fil
     cd redwoodblog
     yarn redwood dev
 
-Open up a browser to http://localhost:8910 and you will see the Redwood welcome page:
+A browser should automatically open to http://localhost:8910 and you will see the Redwood welcome page:
 
 ![Redwood Welcome Page](https://user-images.githubusercontent.com/300/73012647-97a43d00-3dcb-11ea-8554-42df29c36e4a.png)
 
@@ -84,7 +84,7 @@ That's it for the backend.
 - `public` contains assets not used by React components (they will be copied over unmodified to the final app's root directory):
   - `favicon.png` is the icon that goes in a browser tab when your page is open (apps start with the RedwoodJS logo).
   - `robots.txt` can be used to control what web indexers are allowed to do.
-  - `README.md` explains how, and when, to use the `public` folder for static assets. It also covers best practices for importing assets within components via Webpack. [To read it on Github, click here.](https://github.com/redwoodjs/create-redwood-app/tree/master/web/public)
+  - `README.md` explains how, and when, to use the `public` folder for static assets. It also covers best practices for importing assets within components via Webpack. You can read it on Github [here](https://github.com/redwoodjs/create-redwood-app/tree/master/web/public).
 - `index.css` is a generic place to put your CSS, but there are many options.
 - `index.html` is the standard React starting point for our app.
 - `index.js` the bootstraping code to get our Redwood app up and running.
@@ -99,7 +99,7 @@ Let's give our users something to look at besides the Redwood welcome page. We'l
 This does three things:
 
 - Creates `web/src/pages/HomePage/HomePage.js`. Redwood takes the name you specified as the first argument, capitalizes it, and appends "Page" to construct your new page component.
-- Creates a test file to go along with this new page component at `web/src/pages/HomePage/HomePage.test.js` with a single, passing test. Do _do_ write tests for your components, _don't you??_
+- Creates a test file to go along with this new page component at `web/src/pages/HomePage/HomePage.test.js` with a single, passing test. You _do_ write tests for your components, _don't you??_
 - Adds a `<Route>` in `web/src/Routes.js` that maps the path `/` to the new _HomePage_ page.
 
 > If you look in Routes you'll notice that we're referencing a component, `HomePage`, that isn't imported anywhere. Redwood automatically imports all pages in the Routes file since we're going to need to reference them all anyway. It saves a potentially huge `import` declaration from cluttering up the routes file.
@@ -215,7 +215,7 @@ As a world-class developer you probably saw that copy and pasted `<header>` and 
 
 One way to solve the `<header>` dilemma would be to create a `<Header>` component and include it in both `HomePage` and `AboutPage`. That works, but is there a better solution? Ideally there should only be one reference to the `<header>` anywhere in our code.
 
-When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes "before" `<header>` or "after" `<footer>`. That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
+When you look at these two pages what do they really care about? They have some content they want to display. They really shouldn't have to care what comes before (like a `<header>`) or after (like a `<footer>`). That's exactly what layouts do: they wrap your pages in a component that then renders the page as its child:
 
 <img src="https://user-images.githubusercontent.com/300/70486228-dc874500-1aa5-11ea-81d2-eab69eb96ec0.png" alt="Layouts structure diagram" width="300">
 
@@ -259,6 +259,7 @@ export default BlogLayout
 
 ```javascript
 // web/src/pages/HomePage/HomePage.js
+
 import BlogLayout from 'src/layouts/BlogLayout'
 
 const HomePage = () => {
@@ -270,6 +271,7 @@ export default HomePage
 
 ```javascript
 // web/src/pages/AboutPage/AboutPage.js
+
 import { Link, routes } from '@redwoodjs/router'
 import BlogLayout from 'src/layouts/BlogLayout'
 
@@ -374,8 +376,8 @@ First let's define the data structure for a post in the database. Open up `api/p
 
 ```javascript
 datasource DS {
-  provider = "sqlite"
-  url = "file:./dev.db"
+  provider = "redwood"
+  url = env("DB_HOST")
 }
 
 generator photonjs {
@@ -457,9 +459,9 @@ So, Redwood just created all the pages, components and services necessary to per
 Here's what happened when we ran that `yarn rw g scaffold post` command:
 
 - Added an _SDL_ file to define several GraphQL queries and mutations in `api/src/graphql/posts.sdl.js`
-- Added a _services_ file in `api/src/services/posts.js` that makes the Photon calls to get data in and out of the database
+- Added a _services_ file in `api/src/services/posts/posts.js` that makes the Photon calls to get data in and out of the database
 - Created several _pages_ in `web/src/pages`:
-  - `EditPostsPage` for editing a post
+  - `EditPostPage` for editing a post
   - `NewPostPage` for creating a new post
   - `PostPage` for showing the detail of a post
   - `PostsPage` for listing all the posts
@@ -478,7 +480,7 @@ Here's what happened when we ran that `yarn rw g scaffold post` command:
 >
 > As far as the generators are concerned:
 >
-> - Services are always plural.
+> - Services filenames are always plural.
 > - The methods in the services will be singular or plural depending on if they are expected to return multiple posts or a single post (`posts` vs. `createPost`).
 > - SDL filenames are plural.
 > - Pages that come with the scaffolds are plural or singular depending on whether they deal with many or one post. When using the `page` generator it will stick with whatever name you give the command.
@@ -502,15 +504,13 @@ We already have `HomePage` so we won't need to create that. We want to display a
 
 Oh boy, our first page with data and we already have to worry about loading states, errors, and blank slates...or do we?
 
-### Cells
+## Cells
 
 These features are common in most web apps. We wanted to see if there was something we could do to make developers' lives easier when it comes to adding them to a typical component. We think we've come up with something to help. We call them _Cells_. Cells provide a simpler and more declarative approach to data fetching.
 
 When you create a cell you export several specially named constants and then Redwood takes it from there. A typical cell may look something like:
 
 ```javascript
-import PostCell from 'src/components/PostCell'
-
 export const QUERY = gql`
   query {
     posts {
@@ -545,7 +545,7 @@ When React renders this component Redwood will:
 - Perform the `QUERY` and display the `Loader` component until a response is received
 - Once the query returns it will display one of three states:
   - If there was an error, the `Failure` component
-  - If the data return is empty (null or empty array), the `Empty` component
+  - If the data return is empty (`null` or empty array), the `Empty` component
   - Otherwise, the `Success` component
 
 There are also some lifecycle helpers like `beforeQuery` (for massaging any props before being given to the `Query`) and `afterQuery` (for massaging the data returned from GraphQL but before being sent to the `Success` component)
@@ -558,7 +558,7 @@ A guideline for when to use cells is if your component needs some data from the 
 
 The homepage displaying a list of posts is a perfect candidate for our first cell. Naturally, there is a Redwood generator for them:
 
-    yarn rw g cell blog_posts
+    yarn rw g cell BlogPosts
 
 This command will result in a new file at `/web/src/components/BlogPostsCell/BlogPostsCell.js` (and a test file) with some boilerplate to get you started:
 
@@ -643,17 +643,17 @@ The browser should actually show an array with a number or two (assuming you cre
 > **In the `Success` component, where did `posts` come from?**
 >
 > Notice in the `QUERY` that the query we're making is `posts`. Whatever the name of this query is, that's the name of the prop that will be available in `Success` with your data. You can alias the name of the variable containing the result of the GraphQL query, and that will be the name of the prop:
-
-```javascript
-export const QUERY = gql`
-  query {
-    postIds: posts {
-      id
-    }
-  }
-`
-```
-
+>
+> ```javascript
+> export const QUERY = gql`
+>   query {
+>     postIds: posts {
+>       id
+>     }
+>   }
+> `
+> ```
+>
 > Now `postIds` will be available in `Success` instead of `posts`
 
 In addition to the `id` that was added to the `query` by the generator, let's get the title, body, and createdAt too:
@@ -713,7 +713,7 @@ To sum up, what did we actually do to get this far?
 
 This will become a standard lifecycle of new features as you build a Redwood app.
 
-So far, other than a little HTML, we haven't had to do much by hand. And we especially didn't have to write a bunch of plumbing just to move data from one place to another. Makes web development a little more enjoyable, don't you think?
+So far, other than a little HTML, we haven't had to do much by hand. And we especially didn't have to write a bunch of plumbing just to move data from one place to another. It makes web development a little more enjoyable, don't you think?
 
 ## Side Quest: How Redwood Works with Data
 
@@ -809,7 +809,7 @@ If you're using a Redwood **cell** then this data will be available to you in yo
 
 Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
 
-    yarn rw g page blog_post
+    yarn rw g page BlogPost
 
 > Note that we can't call this page simply `Post` because our scaffold already created a page with that name.
 
@@ -817,6 +817,7 @@ Now let's link the title of the post on the homepage to the detail page (and inc
 
 ```javascript
 // web/src/components/BlogPostsCell/BlogPostsCell.js
+
 import { Link, routes } from '@redwoodjs/router'
 
 // Loading, Empty and Failure definitions...
@@ -836,7 +837,7 @@ export const Success = ({ posts }) => {
 }
 ```
 
-If you click the link you should see the boilerplate text on `BlogPostPage`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/blog-post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
+If you click the link on the title of the blog po st you should see the boilerplate text on `BlogPostPage`. But what we really need is to specify _which_ post we want to view on this page. It would be nice to be able to specify the ID of the post in the URL with something like `/blog-post/1`. Let's tell the `<Route>` to expect another part of the URL, and when it does, give that part a name that we can reference later:
 
 ```javascript
 // web/src/Routes.js
@@ -926,9 +927,15 @@ const BlogPostPage = ({ id }) => {
 
 We can prove it! Try going to the detail page for a post in the browser and—uh oh. Hmm:
 
-<img src="https://user-images.githubusercontent.com/300/73212685-96dd1500-4103-11ea-9108-4162470aeb6d.png" />
+![image](https://user-images.githubusercontent.com/300/75820346-096b9100-5d51-11ea-8f6e-53fda78d1ed5.png)
 
-Okay, it turns out that route params are extracted as strings from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `BlogPostCell`, but honestly, we can do better than that!
+> By the way, this error message you're seeing is thanks to the `Failure` section of our Cell!
+
+If you take a look in the web inspector console you can see the actual error coming from GraphQL:
+
+    [GraphQL error]: Message: Variable "$id" got invalid value "1"; Expected type Int. Int cannot represent non-integer value: "1", Location: [object Object], Path: undefined
+
+It turns out that route params are extracted as strings from the URL, but GraphQL wants an integer for the ID. We could use `parseInt()` to convert it to a number before passing it into `BlogPostCell`, but honestly, we can do better than that!
 
 ### Route Param Types
 
@@ -964,7 +971,7 @@ Voilá! Not only will this convert the `id` param to a number before passing it 
 
 Now let's display the actual post instead of just dumping the query result. This seems like the perfect place for a good old fashioned component since we're displaying a post on both the home page and this detail page, and it's (currently) the same exact output. Let's Redwood-up a component (I just invented that phrase):
 
-    yarn rw g component blog_post
+    yarn rw g component BlogPost
 
 Which creates `web/src/components/BlogPost/BlogPost.js` (and test!) as a super simple React component:
 
@@ -1006,11 +1013,23 @@ And update `BlogPostsCell` and `BlogPostCell` to use this new component instead 
 
 ```javascript
 // web/src/components/BlogPostsCell/BlogPostsCell.js
+
+import BlogPost from 'src/components/BlogPost'
+
+// Loading, Empty, Failure...
+
 export const Success = ({ posts }) => {
   return posts.map((post) => <BlogPost key={post.id} post={post} />)
 }
+```
 
+```javascript
 // web/src/components/BlogPostCell/BlogPostCell.js
+
+import BlogPost from 'src/components/BlogPost'
+
+// Loading, Empty, Failure...
+
 export const Success = ({ post }) => {
   return <BlogPost post={post} />
 }
@@ -1029,12 +1048,6 @@ Let's summarize:
 3. We created a cell to fetch and display the post.
 4. Redwood made the world a better place by making that `id` available to us at several key junctions in our code and even turning it into a number automatically.
 5. We turned the actual post display into a standard React component and used it in both the homepage and new detail page.
-
-## Side Quest: Naming Conventions
-
-- Why things are named like Component/Component.js
-- Storybook and tests
-- SDL and services
 
 ## Everyone's Favorite Thing to Build: Forms
 
