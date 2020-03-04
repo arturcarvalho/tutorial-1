@@ -805,7 +805,7 @@ Back to our data flow: Apollo has called the resolver which, in our case, retrie
 
 If you're using a Redwood **cell** then this data will be available to you in your `Success` component ready to be looped through and/or displayed like any other React component.
 
-## Displaying a Single Blog Post - Routing Params
+## Routing Params
 
 Now that we have our homepage listing all the posts, let's build the "detail" page—a canonical URL that displays a single post. First we'll generate the page and route:
 
@@ -1053,7 +1053,7 @@ Let's summarize:
 
 Wait, don't close your browser! You had to know this was coming eventually, didn't you? And you've probably realized by now we wouldn't even have this section in the tutorial unless Redwood had figured out a way to make forms less soul-sucking than usual. In fact Redwood might even make you _love_ building forms. Well, love is a strong word. _Like_ building forms. _Tolerate_ building them?
 
-We already have a form or two in our app; remember our posts scaffold? And those work pretty well! How hard can it be? (Hopefully you haven't sneaked a peek at that code—what's coming next will be much more impressive if you haven't yet.)
+We already have a form or two in our app; remember our posts scaffold? And those work pretty well! How hard can it be? (Hopefully you haven't sneaked a peek at that code—what's coming next will be much more impressive if you haven't.)
 
 Let's build the simplest form that still makes sense for our blog, a "contact us" form.
 
