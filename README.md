@@ -209,7 +209,7 @@ export default AboutPage
 
 Great! Try that out in the browser and verify you can get back and forth.
 
-As a world-class developer you probably saw that copy and pasted `<header>` and developed an involuntary facial tic. We feel you. That's why Redwood has a little something called _Layouts_.
+As a world-class developer you probably saw that copy-and-pasted `<header>` and gasped in disgust. We feel you. That's why Redwood has a little something called _Layouts_.
 
 ## Layouts
 
@@ -2107,13 +2107,15 @@ How about getting this thing out into the real world?
 
 ## Deployment
 
-The whole reason we started building Redwood was to make full-stack webapps easier to build and deploy on the JAMstack. You've seen what building a Redwood app is like, how about we try deploying one?
+The whole reason we started building Redwood was to make full-stack web apps easier to build and deploy on the JAMstack. You've seen what building a Redwood app is like, how about we try deploying one?
 
-Before we continue make sure your app is fully commited on live somewhere on GitHub, GitLab or Bitbucket. We're going to link Netlify directly to our git repo so that a simple push to `master` will re-deploy our site! If you haven't worked on the JAMstack yet you're in for a pleasent surprise!
+Before we continue, make sure your app is fully committed and pushed to GitHub, GitLab, or Bitbucket. We're going to link Netlify directly to our git repo so that a simple push to `master` will re-deploy our site! If you haven't worked on the JAMstack yet you're in for a pleasent surprise!
 
 ### The Database
 
-We'll need a database somewhere on the internet to store our data. Locally we've been using SQLite but that's meant to be a single-user, disc-based store and isn't suited for the kind of connection and concurrency requirements a real, live website will require. For the purposes we're going to use Postgres. Don't worry if you aren't familiar with Postgres, Prisma will do all the heavy lifting, we just need to get one available to the outside world so it can be accessed by our app.
+We'll need a database somewhere on the internet to store our data. Locally we've been using SQLite but that's meant to be a single-user, disc-based store and isn't suited for the kind of connection and concurrency requirements a real, live website will require. For this tutorial we're going to use Postgres. Don't worry if you aren't familiar with Postgres, Prisma will do all the heavy lifting, we just need to get one available to the outside world so it can be accessed by our app.
+
+> For now, you need to set up your own database, but we are working with various infrastructure providers to make this process simpler and more JAMstacky. Stay tuned for improvements in that regard!
 
 There are several hosting providers where you can quickly start up a Postgres instance:
 
@@ -2175,11 +2177,13 @@ Did it work! Yay! If the deploy failed, check the log output and see if you can 
 
 ### Push to Deploy
 
-Now that our site is deployed to Netlify we have the amazing benefit of deploying whenever we push to `master`. Try it now! Change some text in `BlogLayout`, commit and push. If you go to the "Deploys" tab in Netlify you should see it appear with a "Building" badge. A couple of minutes later and your site is live!
+Now that our site is deployed to Netlify we have the amazing benefit of deploying whenever we push to `master`. Try it now! Change some text in `BlogLayout`, commit, and push. If you go to the "Deploys" tab in Netlify you should see it appear with a "Building" badge. A couple of minutes later and your site is live!
 
 Another neat feature is Branch Deploys. When you create a branch and push it up to your repo, Netlify will build that branch at a unique URL so that you can test your changes, leaving the main site alone. Once your branch is merged to `master` then a deploy at your main site will run and your changes will show to the world.
 
 > You also have the ability to "lock" the `master` branch so that deploys do not automatically occur on every push—you need to manually tell Netlify to deploy the latest, either by going to the site or using the [Netlify CLI](https://cli.netlify.com/).
+
+> In this tutorial, your lambda functions will be connecting directly to the Postgres database. Because Postgres has a limited number of concurrent connections it will accept, this does not scale very well. The proper solution is to put a connection pooling service in front of Postgres and connect to that from your lambda functions. We are working on making this process much easier, but keep it in mind before you deploy a Redwood app to production and announce it to the world.
 
 ## Authentication
 
