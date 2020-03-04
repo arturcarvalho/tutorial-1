@@ -1139,6 +1139,7 @@ Well that was anticlimactic. You can't even see it in the browser. Let's add a f
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
+
 import { Form, TextField } from '@redwoodjs/web'
 import BlogLayout from 'src/layouts/BlogLayout'
 
@@ -1181,7 +1182,7 @@ export default ContactPage
 
 <img src="https://user-images.githubusercontent.com/300/73305544-269bc580-41cf-11ea-821f-84f08bb9a5fb.png" />
 
-We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up but we have no indication that the form submitted or what happened to the data. Next we'll get the data in our fields.
+We have what might actually be considered a real, bonafide form here. Try typing something in and clicking "Save". Nothing blew up on the page but we have no indication that the form submitted or what happened to the data (although you may have noticed an error in the Web Inspector). Next we'll get the data in our fields.
 
 ### onSubmit
 
@@ -1225,7 +1226,7 @@ const ContactPage = (props) => {
 
   return (
     <BlogLayout>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <TextField name="name" />
         <TextField name="email" />
         <TextAreaField name="message" />
@@ -1277,7 +1278,7 @@ That's a little better. Try filling out the form and submitting and you should g
 
 ### Validation
 
-"Okay Redwood tutorial author," you're saying, "what's the big deal? You built up Redwood's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! Anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assumption), but what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Redwood, that's who!
+"Okay Redwood tutorial author," you're saying, "what's the big deal? You built up Redwood's form helpers as The Next Big Thing but there are plenty of libraries that will let me skip creating controlled inputs manually. So what?" And you're right! Anyone can fill out a form _correctly_ (although there are plenty of QA folks who would challenge that assertion), but what happens when someone leaves something out, or makes a mistake, or tries to haxorz our form? Now who's going to be there to help? Redwood, that's who!
 
 All three of these fields should be required in order for someone to send a message to us. Let's enforce that with the standard HTML `required` attribute:
 
@@ -1353,7 +1354,7 @@ return (
 )
 ```
 
-And now when we submit the form with blank fields...nothing happens. That seems worse, not better. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want!
+And now when we submit the form with blank fields...the Name field gets focus. Boring. But this is just a stepping stone to our amazing reveal! We have one more form helper component to add—the one that displays errors on a field. Oh it just so happens that it's plain HTML so we can style it however we want!
 
 ### &lt;FieldError&gt;
 
@@ -1544,7 +1545,9 @@ const ContactPage = (props) => {
           name="name"
           style={{ display: 'block' }}
           errorStyle={{ display: 'block', color: 'red' }}
-        />
+        >
+          Name
+        </Label>
         <TextField
           name="name"
           style={{ display: 'block' }}
@@ -1557,7 +1560,9 @@ const ContactPage = (props) => {
           name="email"
           style={{ display: 'block' }}
           errorStyle={{ display: 'block', color: 'red' }}
-        />
+        >
+          Email
+        </Label>
         <TextField
           name="email"
           style={{ display: 'block' }}
@@ -1594,8 +1599,6 @@ export default ContactPage
 
 > In addition to `style` and `errorStyle` you can also use `className` and `errorClassName`
 
-You might notice that the labels became lowercase. By default when you use `<Label>` as a self-closing tag (with no text content and closing `</Label>`) it will use the `name` attribute as the text label.
-
 ### Validating Input Format
 
 We should make sure the email field actually contains an email:
@@ -1624,7 +1627,7 @@ That is definitely not the end-all-be-all for email address validation, but pret
 <TextField
   name="email"
   style={{ display: 'block' }}
-  errorStyle={{ borderColor: 'red' }}
+  errorStyle={{ display: 'block', borderColor: 'red' }}
   validation={{
     required: true,
     pattern: {
@@ -1637,7 +1640,9 @@ That is definitely not the end-all-be-all for email address validation, but pret
 
 <img src="https://user-images.githubusercontent.com/300/73306774-be9aae80-41d1-11ea-8f72-ac783ec44e76.png" />
 
-You may have noticed that trying to submit a form with validation errors outputs nothing to the console—it's not actually submitting. Fix the errors and all is well.
+You may have noticed that trying to submit a form with validation errors outputs nothing to the console—it's not actually submitting. That's a good thing! Fix the errors and all is well.
+
+> When a validation error appears it will _disappear_ as soon as you fix the content of the field. You don't have to click "Submit" again to remove the error messages.
 
 Finally, you know what would _really_ be nice: if the fields were validated as soon as the user leaves each one so they don't fill out the whole thing and submit just to see multiple errors appear. Let's do that:
 
@@ -1657,7 +1662,7 @@ Having a contact form is great, but only if you actually get the contact somehow
 
 ## Saving Data
 
-Let's add a new database table. Open up `api/prisma/schema.prisma` and add a Contact table:
+Let's add a new database table. Open up `api/prisma/schema.prisma` and add a Contact model after the Post model that's there now:
 
 ```javascript
 // api/prisma/schema.prisma
@@ -1722,11 +1727,11 @@ What's `ContactInput`? Redwood follows the GraphQL recommendation of using [Inpu
 
 Since all of the DB columns were required in the `schema.prisma` file they are marked as required here (the `!` suffix on the datatype).
 
-> Remember: `schema.prisma` requires an extra `?` character when a field is _not_ required, GraphQL's SDL requires an extra `!` when a field _is_ required.
+> **Remember:** `schema.prisma` syntax requires an extra `?` character when a field is _not_ required, GraphQL's SDL syntax requires an extra `!` when a field _is_ required.
 
-As described in [Side Quest: How Redwood Deals with Data](#side-quest-how-redwood-works-with-data) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts.js`)
+As described in [Side Quest: How Redwood Deals with Data](side-quest-how-redwood-works-with-data) there are no explict resolvers defined in the SDL file. Redwood follows a simple naming convention—each field listed in the `Query` and `Mutation` types map to a function with the same name in the `services` file with the same name as the `sdl` file (`api/src/graphqal/contacts.sdl.js -> api/src/services/contacts/contacts.js`)
 
-In this case we're creating a single `Mutation` that we'll call `createContact`. Add that to the end of the SDL file:
+In this case we're creating a single `Mutation` that we'll call `createContact`. Add that to the end of the SDL file (before the closing backtick):
 
 ```javascript
 // api/src/graphql/contacts.sdl.js
@@ -1741,19 +1746,15 @@ The `createContact` mutation will accept a single variable, `input`, that is an 
 That's it for the SDL file, let's define the service that will actually save the data to the database. The service includes a default `contacts` function for getting all contacts from the database. Let's add our mutation to create a new contact:
 
 ```javascript
-// api/src/services/contacts.js
+// api/src/services/contacts/contacts.js
 
-const Contacts = {
-  contacts: () => {
-    return photon.contacts.findMany()
-  },
-
-  createContact: ({ input }) => {
-    return photon.contacts.create({ data: input })
-  },
+export const contacts = () => {
+  return db.contact.findMany()
 }
 
-export default Contacts
+export const createContact = ({ input }) => {
+  return db.contact.create({ data: input })
+}
 ```
 
 Thanks to Photon it takes very little code to actually save something to the database! This is an asynchronous call but we didn't have to worry about resolving Promises or dealing with `async/await`. Apollo will do that for us!
@@ -1772,11 +1773,11 @@ Not very exciting yet, but check out that "Docs" tab on the far right:
 
 <img src="https://user-images.githubusercontent.com/300/73311311-fce89b80-41da-11ea-9a7f-2ef6b8191052.png" />
 
-It's the complete schema as defined by our SDL files! The Playground will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database:
+It's the complete schema as defined by our SDL files! The Playground will ingest these definitions and give you autocomplete hints on the left to help you build queries from scratch. Try getting the IDs of all the posts in the database; type the query at the left and then click the "Play" button to execute:
 
 <img src="https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png" />
 
-We should also be able to create a new contact:
+We should also be able to create a new contact (make sure to input both the mutation and the Query Variables in the lower left pane):
 
 <img src="https://user-images.githubusercontent.com/300/73311826-471e4c80-41dc-11ea-9476-a9ef8cdfce20.png" />
 
@@ -1800,7 +1801,7 @@ const CREATE_CONTACT = gql`
 
 We reference the `createContact` mutation we defined in the Contacts SDL passing it an `input` object which will contain the actual name, email and message fields.
 
-Next we'll call the `useMutation` hook provided by Apollo which will allow us to execute the mutation when we're ready and also capture the loading and error states once the call is made (don't forget the `import` statement):
+Next we'll call the `useMutation` hook provided by Apollo which will allow us to execute the mutation when we're ready (don't forget the `import` statement):
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -1921,9 +1922,13 @@ const [create, { loading, error }] = useMutation(CREATE_CONTACT, {
 
 ### Displaying Server Errors
 
-Finally, let's let the user know if a server error occurs. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place Form can't know about those, but we still need to let the user know something went wrong.
+Next we'll inform the user of any server errors. So far we've only notified the user of _client_ errors: a field was missing or formatted incorrectly. But if we have server-side constraints in place `<Form>` can't know about those, but we still need to let the user know something went wrong.
 
-We have email validation on the client, but any good developer knows _never trust the client_. Let's add the email validation on the API as well to be sure no bad data gets into our database, even if someone somehow bypassed our client-side validation.
+We have email validation on the client, but any good developer knows [_never trust the client_](https://www.codebyamir.com/blog/never-trust-data-from-the-browser). Let's add the email validation on the API as well to be sure no bad data gets into our database, even if someone somehow bypassed our client-side validation.
+
+> Why don't we need server-side validation for the existence of name, email and message? Because the database is doing that for us. Remember the `String!` in our SDL definition? That adds a constraint in the database the the field cannot be `null`. If a `null` was to get all the way down to the database it would reject the insert/update and GraphQL would throw an error back to us on the client.
+>
+> There's no `Email!` datatype so we'll need to validate that on our own.
 
 We talked about business logic belonging in our services files and this is a perfect example. Let's add a `validate` function to our `Contacts` service:
 
@@ -1942,18 +1947,14 @@ const validate = (input) => {
   }
 }
 
-const Contacts = {
-  contacts: () => {
-    return photon.contacts.findMany()
-  },
-
-  createContact: ({ input }) => {
-    validate(input)
-    return photon.contacts.create({ data: input })
-  },
+export const contacts = () => {
+  return db.contact.findMany()
 }
 
-export default Contacts
+export const createContact = ({ input }) => {
+  validate(input)
+  return db.contact.create({ data: input })
+}
 ```
 
 So when `createContact` is called it will first validate the inputs and only if no errors are thrown will it continue to actually create the record in the database.
@@ -1964,8 +1965,11 @@ We already capture any existing error in the `error` constant that we got from `
 // web/src/pages/ContactPage/ContactPage.js
 
 <Form onSubmit={onSubmit} validation={{ mode: 'onBlur' }}>
-  { error && (
-    <div style={{ color: 'red' }}>We couldn't send your message: {error.message}</div>
+  {error && (
+    <div style={{ color: 'red' }}>
+      {"We couldn't send your message: "}
+      {error.message}
+    </div>
   )}
   // ...
 ```
@@ -1993,7 +1997,7 @@ It ain't pretty, but it works. Seeing a "GraphQL error" is not ideal, and it wou
 
 Remember when we said that `<Form>` had one more trick up its sleeve? Here it comes!
 
-Remove the inline error display we just added (`{ error && ...`) and replace it with `<FormError>`, passing the `error` constant we got from `useMutation` and a little bit of styling to `wrapperStyle` (don't forget the `import`). We'll also pass `error` to `<Form>` so it can setup a context:
+Remove the inline error display we just added (`{ error && ...}`) and replace it with `<FormError>`, passing the `error` constant we got from `useMutation` and a little bit of styling to `wrapperStyle` (don't forget the `import`). We'll also pass `error` to `<Form>` so it can setup a context:
 
 ```javascript
 // web/src/pages/ContactPage/ContactPage.js
@@ -2013,7 +2017,10 @@ import {
 return (
   <BlogLayout>
     <Form onSubmit={onSubmit} validation={{ mode: 'onBlur' }} error={error}>
-      <FormError error={error} wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }} />
+      <FormError
+        error={error}
+        wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }}
+      />
     //...
 ```
 
@@ -2021,14 +2028,14 @@ Now submit a message without a name:
 
 <img src="https://user-images.githubusercontent.com/300/73317487-1b569300-41eb-11ea-9fae-a9a7ae3c52f1.png" />
 
+We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long; the user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
+
 > `<FormError>` has several styling options which are attached to different parts of the message:
 >
 > - `wrapperStyle` / `wrapperClassName`: the container for the entire message
 > - `titleStyle` / `titleClassName`: the "Can't create new contact" title
 > - `listStyle` / `listClassName`: the `<ul>` that contains the list of errors
 > - `listItemStyle` / `listItemClassName`: each individual `<li>` around each error
-
-We get that error message at the top saying something went wrong in plain english _and_ the actual field is highlighted for us, just like the inline validation! The message at the top may be overkill for such a short form, but it can be key if a form is multiple screens long. The user gets a summary of what went wrong all in one place and they don't have to resort to hunting through a long form looking for red boxes.
 
 ### One more thing...
 
@@ -2062,10 +2069,10 @@ Finally we'll tell `<Form>` to use the `formMethods` we just instantiated instea
 return (
   <BlogLayout>
     <Form
-      formMethods={formMethods}
       onSubmit={onSubmit}
       validation={{ mode: 'onBlur' }}
       error={error}
+      formMethods={formMethods}
     >
     // ...
 ```
@@ -2084,7 +2091,7 @@ return (
   })
 ```
 
-That's it! [React Hook Form](https://react-hook-form.com/) provides a bunch of [functionality](https://react-hook-form.com/api) that even `<Form>` doesn't expose. When you want to get to that functionality you can—just call `useForm()` yourself but make sure to pass it as a prop to `<Form>` so that it keeps working!
+That's it! [React Hook Form](https://react-hook-form.com/) provides a bunch of [functionality](https://react-hook-form.com/api) that even `<Form>` doesn't expose. When you want to get to that functionality you can: just call `useForm()` yourself but make sure to pass the returned object (we called it `formMethods`) as a prop to `<Form>` so that the validation and other functionality keeps working.
 
 The public site is looking pretty good. How about the administrative features that let us create and edit posts? We should move them to some kind of admin section and put them behind a login so that random users poking around at URLs can't create ads for discount pharmaceuticals.
 
