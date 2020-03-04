@@ -1777,10 +1777,6 @@ It's the complete schema as defined by our SDL files! The Playground will ingest
 
 <img src="https://user-images.githubusercontent.com/300/70951466-52e0f580-2018-11ea-91d6-5a5712858781.png" />
 
-We should also be able to create a new contact (make sure to input both the mutation and the Query Variables in the lower left pane):
-
-<img src="https://user-images.githubusercontent.com/300/73311826-471e4c80-41dc-11ea-9476-a9ef8cdfce20.png" />
-
 The GraphQL Playground is a great way to experiment with your API or troubleshoot when you come across a query or mutation that isn't behaving in the way you expect.
 
 ### Creating a Contact
