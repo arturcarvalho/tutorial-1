@@ -2157,7 +2157,7 @@ Now we're going to [create a Netlify account](https://app.netlify.com/signup) if
 
 <img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" />
 
-Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to "Settings" at the top and then "Build & Deploy" > "Environment". Click "Edit Variables" and this is where we'll paste the database connection URI we got from Heroku (note the "Key" is "DB_HOST"):
+Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to "Settings" at the top and then "Build & Deploy" > "Environment". Click "Edit Variables" and this is where we'll paste the database connection URI we got from Heroku (note the "Key" is **DB_HOST**):
 
 <img src="https://user-images.githubusercontent.com/300/73705038-9e735f80-46a9-11ea-9f38-17c15c2afe9a.png" />
 
@@ -2165,13 +2165,17 @@ Click "Save" and you should see the new variable listed:
 
 <img src="https://user-images.githubusercontent.com/300/73704961-77b52900-46a9-11ea-98f9-7150a7ddf572.png" />
 
+Add one more variable, this one's key is **NETLIFY_BUILD_LIFECYCLE_TRIAL** and the value is **enabled=true** This will allow us to use Netlify's new build process which is in beta as of the time of this writing. Eventually it will become the default for new sites but for now we need to use this variable to trigger it.
+
+![Netlify Environment Variable Screenshot](https://user-images.githubusercontent.com/300/75835402-a6d7bc80-5d73-11ea-83a7-4873301fe5de.png)
+
 Back to the "Deploys" tab at the top. Open the "Trigger deploy" dropdown and click "Clear cache and deploy site":
 
-<img src="https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png" />
+![Netlify Deploy Screenshot](https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png)
 
 This will take you to the log output showing the site being built. With a little luck (and SCIENCE) it will complete successfully! Go back and click the URL of your Netlify site towards the top:
 
-<img alt="Screen Shot 2020-02-03 at 5 24 28 PM" src="https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png">
+![Netlify URL](https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png)
 
 Did it work! Yay! If the deploy failed, check the log output and see if you can make sense of the error. If the deploy was successful but the site doesn't come up, try opening the web inspector and look for errors. Are you sure you pasted the entire Postgres connection string correctly?
 
