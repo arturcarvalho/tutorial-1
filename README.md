@@ -2112,7 +2112,7 @@ How about getting this thing out into the real world?
 
 The whole reason we started building Redwood was to make full-stack web apps easier to build and deploy on the JAMstack. You've seen what building a Redwood app is like, how about we try deploying one?
 
-Before we continue, make sure your app is fully committed and pushed to GitHub, GitLab, or Bitbucket. We're going to link Netlify directly to our git repo so that a simple push to `master` will re-deploy our site! If you haven't worked on the JAMstack yet you're in for a pleasent surprise!
+Before we continue, make sure your app is fully committed and pushed to GitHub, GitLab, or Bitbucket. We're going to link Netlify directly to our git repo so that a simple push to `master` will re-deploy our site. If you haven't worked on the JAMstack yet you're in for a pleasent surprise!
 
 ### The Database
 
@@ -2128,27 +2128,27 @@ There are several hosting providers where you can quickly start up a Postgres in
 
 We're going to go with Heroku for now because it's a) free and b) easier to get started from scratch than AWS.
 
-Head over to [Heroku](https://signup.heroku.com/) and create an account or log in. Then click that "Create a new app" button:
+Head over to [Heroku](https://signup.heroku.com/) and create an account or log in. Then click that **Create a new app** button:
 
 <img alt="Screen Shot 2020-02-03 at 3 22 36 PM" src="https://user-images.githubusercontent.com/300/73703866-438c3900-46a6-11ea-9a90-bdab2fed8bff.png">
 
-Give it a name like "redwoodblog" if it's available. Then we're going to click "Find more add-ons":
+Give it a name like "redwoodblog" if it's available. Then we're going to click **Find more add-ons** in the **Add-ons** section:
 
 <img alt="Screen Shot 2020-02-03 at 3 23 25 PM" src="https://user-images.githubusercontent.com/300/73703877-4e46ce00-46a6-11ea-87c0-079346f4d9b3.png">
 
-And scroll down to "Heroku Postgres":
+And scroll down to **Heroku Postgres**:
 
 <img alt="Screen Shot 2020-02-03 at 3 23 48 PM" src="https://user-images.githubusercontent.com/300/73703883-556ddc00-46a6-11ea-8777-ee27d2202e0e.png">
 
-Click that, and tell it you want to connect it to the app you just created, then click "Provision add-on":
+Click that, and tell it you want to connect it to the app you just created, then click **Provision add-on**:
 
 <img alt="Screen Shot 2020-02-03 at 3 24 15 PM" src="https://user-images.githubusercontent.com/300/73703930-64548e80-46a6-11ea-9f1b-e06a183834f4.png">
 
-You'll be returned to your app's detail page. You should be on the "Resources" tab and see the Heroku Postgres add-on ready to go:
+You'll be returned to your app's detail page. You should be on the **Resources** tab and see the Heroku Postgres add-on ready to go:
 
 <img alt="Screen Shot 2020-02-03 at 3 24 43 PM" src="https://user-images.githubusercontent.com/300/73703951-6ae30600-46a6-11ea-8d9b-a900b7af2ac5.png">
 
-Click the "Heroku Postgres" link to get to the detail page, then the "Settings" tab and finally the "View Credentials..." button. We did all the steps above so that we could copy the URI listed at the bottom:
+Click the **Heroku Postgres** link to get to the detail page, then the **Settings** tab and finally the **View Credentials...** button. We did all the steps above so that we could copy the URI listed at the bottom:
 
 <img alt="Screen Shot 2020-02-03 at 3 25 31 PM" src="https://user-images.githubusercontent.com/300/73703956-70405080-46a6-11ea-81f2-bed99ca4c4cc.png">
 
@@ -2156,23 +2156,27 @@ It will be really long and scroll off the right side of the page so make sure yo
 
 ### Netlify
 
-Now we're going to [create a Netlify account](https://app.netlify.com/signup) if you don't have one already. Once you've signed up and verified your email done just click the "New site from Git" button at the upper right:
+Now we're going to [create a Netlify account](https://app.netlify.com/signup) if you don't have one already. Once you've signed up and verified your email done just click the **New site from Git** button at the upper right:
 
 <img src="https://user-images.githubusercontent.com/300/73697486-85f84a80-4693-11ea-922f-0f134a3e9031.png" />
 
-Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to "Settings" at the top and then "Build & Deploy" > "Environment". Click "Edit Variables" and this is where we'll paste the database connection URI we got from Heroku (note the "Key" is **DB_HOST**):
+Now just authorize Netlify to connect to your git hosting provider and find your repo. Once you do that Netlify will start building your app but it will fail—we haven't told it where to find our database yet! Go to **Settings** at the top and then **Build & Deploy** > **Environment**. Click **Edit Variables** and this is where we'll paste the database connection URI we got from Heroku (note the **Key** is "DB_HOST"):
 
 <img src="https://user-images.githubusercontent.com/300/73705038-9e735f80-46a9-11ea-9f38-17c15c2afe9a.png" />
 
-Click "Save" and you should see the new variable listed:
+Click **Save** and you should see the new variable listed:
 
 <img src="https://user-images.githubusercontent.com/300/73704961-77b52900-46a9-11ea-98f9-7150a7ddf572.png" />
 
-Add one more variable, this one's key is **NETLIFY_BUILD_LIFECYCLE_TRIAL** and the value is **enabled=true** This will allow us to use Netlify's new build process which is in beta as of the time of this writing. Eventually it will become the default for new sites but for now we need to use this variable to trigger it.
+Add one more variable, this one's key is "NETLIFY_BUILD_LIFECYCLE_TRIAL" and the value is "enabled=true" This will allow us to use Netlify's new build process which is in beta as of the time of this writing. Eventually it will become the default for new sites but for now we need to use this variable to trigger it.
 
 ![Netlify Environment Variable Screenshot](https://user-images.githubusercontent.com/300/75835402-a6d7bc80-5d73-11ea-83a7-4873301fe5de.png)
 
-Back to the "Deploys" tab at the top. Open the "Trigger deploy" dropdown and click "Clear cache and deploy site":
+Go to **Build & Deploy** > **Continuous Deployment** and scroll down to **Build image selection**. Make sure that Ubuntu Xenial is selected. If not click **Edit settings** and change it.
+
+![image](https://user-images.githubusercontent.com/300/75920758-d68ad100-5e14-11ea-94cd-606d8e7ca38f.png)
+
+Back to the **Deploys** tab at the top. Open the **Trigger deploy** dropdown and click **Clear cache and deploy site**:
 
 ![Netlify Deploy Screenshot](https://user-images.githubusercontent.com/300/73705216-16da2080-46aa-11ea-881a-72c717139c95.png)
 
@@ -2180,17 +2184,19 @@ This will take you to the log output showing the site being built. With a little
 
 ![Netlify URL](https://user-images.githubusercontent.com/300/73705247-32ddc200-46aa-11ea-833e-3d2b35dc136f.png)
 
-Did it work! Yay! If the deploy failed, check the log output and see if you can make sense of the error. If the deploy was successful but the site doesn't come up, try opening the web inspector and look for errors. Are you sure you pasted the entire Postgres connection string correctly?
+Did it work? Yay! If the deploy failed, check the log output and see if you can make sense of the error. If the deploy was successful but the site doesn't come up, try opening the web inspector and look for errors. Are you sure you pasted the entire Postgres connection string correctly? If you're really, really stuck head over the [Redwood Community](https://community.redwoodjs.com) and ask for help.
 
 ### Push to Deploy
 
-Now that our site is deployed to Netlify we have the amazing benefit of deploying whenever we push to `master`. Try it now! Change some text in `BlogLayout`, commit, and push. If you go to the "Deploys" tab in Netlify you should see it appear with a "Building" badge. A couple of minutes later and your site is live!
+Now that our site is deployed to Netlify we have the amazing benefit of deploying whenever we push to `master`. Try it now! Change some text in `BlogLayout`, commit, and push. If you go to the **Deploys** tab in Netlify you should see it appear with a **Building** badge. A couple of minutes later and your site is live!
 
-Another neat feature is Branch Deploys. When you create a branch and push it up to your repo, Netlify will build that branch at a unique URL so that you can test your changes, leaving the main site alone. Once your branch is merged to `master` then a deploy at your main site will run and your changes will show to the world.
+Another neat feature is _Branch Deploys_. When you create a branch and push it up to your repo, Netlify will build that branch at a unique URL so that you can test your changes, leaving the main site alone. Once your branch is merged to `master` then a deploy at your main site will run and your changes will show to the world. To enable Branch Deploys go to Settings > Continuous Deployment and under the **Deploy contexts** section click **Edit settings** and change **Branch deploys** to "All". You can also enable _Deploy previews_ which will create them for any pull requests against your repo.
 
 > You also have the ability to "lock" the `master` branch so that deploys do not automatically occur on every push—you need to manually tell Netlify to deploy the latest, either by going to the site or using the [Netlify CLI](https://cli.netlify.com/).
 
-> In this tutorial, your lambda functions will be connecting directly to the Postgres database. Because Postgres has a limited number of concurrent connections it will accept, this does not scale very well. The proper solution is to put a connection pooling service in front of Postgres and connect to that from your lambda functions. We are working on making this process much easier, but keep it in mind before you deploy a Redwood app to production and announce it to the world.
+### A Note About DB Connections
+
+In this tutorial, your lambda functions will be connecting directly to the Postgres database. Because Postgres has a limited number of concurrent connections it will accept, this does not scale very well. The proper solution is to put a connection pooling service in front of Postgres and connect to that from your lambda functions. We are working on making this process much easier, but keep it in mind before you deploy a Redwood app to production and announce it to the world.
 
 ## Authentication
 
