@@ -420,7 +420,7 @@ We apply the migration with another command:
 
 > From now on we'll use the shorter `rw` alias instead of the full `redwood` name.
 
-This will apply the migration (which runs the commands agains the database to create the changes we need) which results in creating a new table called `Post` with the fields we defined above.
+This will apply the migration (which runs the commands against the database to create the changes we need) which results in creating a new table called `Post` with the fields we defined above.
 
 ### Creating a Post Editor
 
